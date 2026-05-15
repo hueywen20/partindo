@@ -13,11 +13,16 @@ return new class extends Migration
     {
         Schema::create('purchase_orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('purchase_order_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-            $table->decimal('qty', 12, 2)->default(0);
-            $table->decimal('price', 12, 2)->default(0);
-            $table->decimal('total', 12, 2)->default(0);
+            $table->string('po_no')->unique();
+            $table->date('date');
+
+            $table->foreignId('customer_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('supplier_id')->nullable()->constrained()->nullOnDelete();
+
+            $table->enum('status', ['open','partial','fulfilled','cancelled'])->default('open');
+
+            $table->decimal('grand_total', 12, 2)->default(0);
+            $table->decimal('final_total', 12, 2)->default(0);
             $table->timestamps();
         });
     }

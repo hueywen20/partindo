@@ -26,7 +26,7 @@ class BrandResource extends Resource
         return BrandForm::configure($schema);
     }
     
-    protected static string|UnitEnum|null $navigationGroup = 'Management';
+    protected static string|UnitEnum|null $navigationGroup = 'Master';
 
 
     public static function table(Table $table): Table

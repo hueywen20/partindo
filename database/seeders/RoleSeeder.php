@@ -154,7 +154,12 @@ class RoleSeeder extends Seeder
 
         foreach ($roles as $roleName => $rolePerms) {
             $role = Role::firstOrCreate(['name' => $roleName]);
-            $role->syncPermissions($rolePerms);
+            // $role->syncPermissions($rolePerms);
+            $role->syncPermissions(Permission::whereIn('name', $rolePerms)->get());
         }
+
+        // IMPORTANT: clear Spatie cache
+        app()[\Spatie\Permission\PermissionRegistrar::class]
+            ->forgetCachedPermissions();
     }
 }
