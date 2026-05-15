@@ -121,7 +121,7 @@ class ProductsTable
             ->filters([
                 // Text filter for name
                 Filter::make('name')
-                    ->form([
+                    ->schema([
                         TextInput::make('name')->placeholder('Search name...'),
                     ])
                     ->query(function (Builder $query, array $data) {
@@ -137,7 +137,7 @@ class ProductsTable
 
                 // Text filter for location
                 Filter::make('location')
-                    ->form([
+                    ->schema([
                         TextInput::make('location')->placeholder('Filter by location...'),
                     ])
                     ->query(function (Builder $query, array $data) {
