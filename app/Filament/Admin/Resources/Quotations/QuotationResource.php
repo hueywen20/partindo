@@ -9,6 +9,7 @@ use App\Filament\Admin\Resources\Quotations\Schemas\QuotationForm;
 use App\Filament\Admin\Resources\Quotations\Tables\QuotationsTable;
 use App\Models\Quotation;
 use App\Models\Product;
+use App\Models\PurchaseOrder;
 use App\Services\QuotationNumberService;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -147,7 +148,23 @@ class QuotationResource extends Resource
                     ->label('Converted')
                     ->formatStateUsing(fn ($state) => $state ? 'Yes' : '—'),
             ])
-            ->actions([
+            ->recordActions([
+                Action::make('convert_to_po')
+                    ->label('Convert to PO')
+                    ->icon(Heroicon::OutlinedArrowRight)
+                    ->color('warning')
+                    ->visible(fn (Quotation $record) =>
+                        in_array($record->status, ['sent', 'draft'])
+                    )
+                    ->requiresConfirmation()
+                    ->action(function (Quotation $record) {
+                        $purchaseOrder = $record->convertToPO();
+
+                        \Filament\Notifications\Notification::make()
+                            ->title('Converted to Purchase Order ' . $purchaseOrder->po_no)
+                            ->success()
+                            ->send();
+                    }),
                 Action::make('convert')
                     ->label('Convert to Invoice')
                     ->icon(Heroicon::OutlinedArrowRight)

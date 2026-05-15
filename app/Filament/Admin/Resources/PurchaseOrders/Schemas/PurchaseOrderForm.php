@@ -1,75 +1,100 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Sales\Schemas;
+namespace App\Filament\Admin\Resources\PurchaseOrders\Schemas;
 
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
+use App\Models\Customer;
+use App\Models\Product;
+use App\Models\Supplier;
+use App\Services\PurchaseOrderNumberService;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
-use App\Models\Product;
-use App\Services\SaleInvoiceNumberService;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Schema;
 
-class SaleForm
+class PurchaseOrderForm
 {
+    // ─── Recalculate row totals + header totals ───────────────────────────────
+
     public static function recalculate(callable $set, callable $get): void
     {
         $items = $get('items') ?? [];
 
         $subtotal = collect($items)->sum(function ($item, $index) use ($set) {
-            $qty = (float) ($item['qty'] ?? 0);
+            $qty   = (float) ($item['qty'] ?? 0);
             $price = (float) ($item['price'] ?? 0);
             $total = $qty * $price;
             $set("items.$index.total", $total);
             return $total;
         });
 
-        $taxRate = (float) ($get('tax') ?? 0);
+        $taxRate  = (float) ($get('tax') ?? 0);
         $discount = (float) ($get('discount') ?? 0);
-        $tax = $subtotal * ($taxRate / 100);
-        $final = max(0, $subtotal + $tax - $discount);
+        $tax      = $subtotal * ($taxRate / 100);
+        $final    = max(0, $subtotal + $tax - $discount);
 
         $set('grand_total', $subtotal);
         $set('final_total', $final);
     }
 
+    // ─── Form layout ─────────────────────────────────────────────────────────
+
     public static function configure(Schema $schema): Schema
     {
         return $schema->components([
+
+            // ── Header ──────────────────────────────────────────────────────
+
+            TextInput::make('po_no')
+                ->label('PO Number')
+                ->default(fn () => PurchaseOrderNumberService::generate())
+                ->disabled()
+                ->dehydrated(true),
 
             DatePicker::make('date')
                 ->default(now())
                 ->required(),
 
-            TextInput::make('sale_inv_no')
-                ->default(fn () => SaleInvoiceNumberService::generate())
-                ->disabled()
-                ->dehydrated(true),
-
             Select::make('customer_id')
                 ->label('Customer')
                 ->options(
-                    \App\Models\Customer::where('status', 1)
-                        ->pluck('customer_name', 'id')
+                    Customer::where('status', 1)->pluck('customer_name', 'id')
                 )
                 ->searchable()
                 ->required(),
 
-            // TextInput::make('reference_no')
-            //     ->label('Reference No'),
+            // Select::make('supplier_id')
+            //     ->label('Supplier')
+            //     ->options(
+            //         Supplier::where('status', 1)->pluck('supplier_name', 'id')
+            //     )
+            //     ->searchable(),
+
+            Select::make('status')
+                ->options([
+                    'open'      => 'Open',
+                    'partial'   => 'Partial',
+                    'fulfilled' => 'Fulfilled',
+                    'cancelled' => 'Cancelled',
+                ])
+                ->default('open')
+                ->required(),
+
+            // ── Line items ──────────────────────────────────────────────────
 
             Repeater::make('items')
                 ->relationship()
                 ->schema([
                     Select::make('product_id')
-                        ->label('Product Name')
+                        ->label('Product')
                         ->options(Product::pluck('name', 'id'))
                         ->searchable()
                         ->live()
                         ->afterStateUpdated(function ($state, $set, $get) {
                             $product = Product::find($state);
                             $set('category', $product?->category);
-                            $set('price', $product?->price ?? 0);
+                            // pre-fill with avg_cost so buyer sees supplier cost
+                            $set('price', $product?->avg_cost ?? 0);
                             self::recalculate($set, $get);
                         })
                         ->required(),
@@ -85,19 +110,12 @@ class SaleForm
                         ->live()
                         ->afterStateUpdated(fn ($state, $set, $get) =>
                             self::recalculate($set, $get)
-                        )
-                        ->rule(function ($get) {
-                            return function ($attribute, $value, $fail) use ($get) {
-                                $product = Product::find($get('product_id'));
-                                if ($product && $value > $product->stock) {
-                                    $fail('Not enough stock');
-                                }
-                            };
-                        }),
+                        ),
 
                     TextInput::make('price')
+                        ->label('Unit Price')
                         ->numeric()
-                        ->prefix('Rp ')
+                        ->prefix('RM ')
                         ->live()
                         ->afterStateUpdated(fn ($state, $set, $get) =>
                             self::recalculate($set, $get)
@@ -105,7 +123,9 @@ class SaleForm
 
                     TextInput::make('total')
                         ->numeric()
-                        ->disabled(),
+                        ->prefix('RM ')
+                        ->disabled()
+                        ->dehydrated(true),
                 ])
                 ->columns(5)
                 ->columnSpanFull()
@@ -117,11 +137,15 @@ class SaleForm
                     self::recalculate($set, $get)
                 ),
 
+            // ── Totals ──────────────────────────────────────────────────────
+
             TextInput::make('grand_total')
+                ->label('Subtotal')
                 ->numeric()
-                ->prefix('Rp ')
+                ->prefix('RM ')
                 ->columnStart(2)
-                ->disabled(),
+                ->disabled()
+                ->dehydrated(true),
 
             TextInput::make('tax')
                 ->label('Tax (%)')
@@ -143,10 +167,12 @@ class SaleForm
                 ),
 
             TextInput::make('final_total')
+                ->label('Final Total')
                 ->numeric()
-                ->prefix('Rp ')
+                ->prefix('RM ')
                 ->columnStart(2)
-                ->disabled(),
+                ->disabled()
+                ->dehydrated(true),
         ]);
     }
 }
