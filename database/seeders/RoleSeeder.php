@@ -81,6 +81,9 @@ class RoleSeeder extends Seeder
             'other_settings' => [
                 'view_other_settings', 'manage_other_settings',
             ],
+            'roles_permissions' => [
+                'view_roles_permissions', 'manage_roles_permissions',
+            ],
 
             // ── Reports ───────────────────────────────────────────────────────
             'report_stock' => [

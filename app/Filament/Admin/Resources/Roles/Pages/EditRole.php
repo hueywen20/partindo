@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Roles\Pages;
 
 use App\Filament\Admin\Resources\Roles\RoleResource;
+use App\Filament\Admin\Resources\Roles\Schemas\RoleForm;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
@@ -17,8 +18,8 @@ class EditRole extends EditRecord
         ];
     }
 
-    protected function getRedirectUrl(): string
+    protected function afterSave(): void
     {
-        return $this->getResource()::getUrl('index');
+        RoleForm::syncPermissions($this->record, $this->data);
     }
 }

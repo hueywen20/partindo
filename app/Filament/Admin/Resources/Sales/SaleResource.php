@@ -23,6 +23,8 @@ class SaleResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'Sales';
 
+    protected static ?int $navigationSort = 3;
+
     protected static ?string $recordTitleAttribute = 'sale_inv_no';
 
     public static function getGloballySearchableAttributes(): array

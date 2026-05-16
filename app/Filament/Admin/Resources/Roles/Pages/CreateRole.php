@@ -3,14 +3,15 @@
 namespace App\Filament\Admin\Resources\Roles\Pages;
 
 use App\Filament\Admin\Resources\Roles\RoleResource;
+use App\Filament\Admin\Resources\Roles\Schemas\RoleForm;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateRole extends CreateRecord
 {
     protected static string $resource = RoleResource::class;
 
-    protected function getRedirectUrl(): string
+    protected function afterCreate(): void
     {
-        return $this->getResource()::getUrl('index');
+        RoleForm::syncPermissions($this->record, $this->data);
     }
 }
