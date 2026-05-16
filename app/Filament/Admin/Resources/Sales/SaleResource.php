@@ -19,7 +19,7 @@ class SaleResource extends Resource
 {
     protected static ?string $model = Sale::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
 
     protected static string|UnitEnum|null $navigationGroup = 'Sales';
 
@@ -29,15 +29,8 @@ class SaleResource extends Resource
     {
         return [
             'sale_inv_no',
-            'reference_no',
             'customer.customer_name',
         ];
-    }
-
-    public static function mutateFormDataBeforeCreate(array $data): array
-    {
-        $data['sale_inv_no'] = \App\Services\SaleInvoiceNumberService::generate();
-        return $data;
     }
 
     public static function form(Schema $schema): Schema
@@ -52,42 +45,16 @@ class SaleResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => ListSales::route('/'),
+            'index'  => ListSales::route('/'),
             'create' => CreateSale::route('/create'),
-            'edit' => EditSale::route('/{record}/edit'),
+            'view' => Pages\ViewSale::route('/{record}'),
+            'edit'   => EditSale::route('/{record}/edit'),
         ];
     }
-
-    // public static function canViewAny(): bool
-    // {
-    //     return auth()->user()?->can('view_sales');
-    // }
-
-    // public static function canCreate(): bool
-    // {
-    //     return auth()->user()?->can('create_sales');
-    // }
-
-    // public static function canEdit($record): bool
-    // {
-    //     return auth()->user()?->can('edit_sales');
-    // }
-
-    // public static function canDelete($record): bool
-    // {
-    //     return auth()->user()?->can('delete_sales');
-    // }
-
-    //  public static function canView($record): bool
-    // {
-    //     return auth()->user()?->can('view_sales');
-    // }
 }

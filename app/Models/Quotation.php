@@ -3,20 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Product;
-use App\Models\Customer;
-use App\Models\QuotationItem;
-use App\Models\PurchaseOrder;
-use App\Models\Sale;
+use App\Services\PurchaseOrderNumberService;
+use App\Services\SaleInvoiceNumberService;
 
 class Quotation extends Model
 {
-    //
     protected $fillable = [
         'quotation_no', 'date', 'valid_until', 'customer_id',
         'status', 'tax', 'discount', 'grand_total', 'final_total',
         'converted_to_sale_id',
+        'converted_to_po_id',
     ];
+
+    // ─── Relationships ────────────────────────────────────────────────────────
 
     public function customer()
     {
@@ -28,25 +27,30 @@ class Quotation extends Model
         return $this->hasMany(QuotationItem::class);
     }
 
-    public function quotation()
+    public function convertedSale()
     {
-        return $this->belongsTo(Quotation::class);
+        return $this->belongsTo(Sale::class, 'converted_to_sale_id');
     }
 
-    public function product()
+    public function convertedPO()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(PurchaseOrder::class, 'converted_to_po_id');
     }
+
+    // ─── Convert Quotation → Purchase Order ──────────────────────────────────
 
     public function convertToPO(): PurchaseOrder
     {
         $purchaseOrder = PurchaseOrder::create([
-            'date'        => now(),
-            'customer_id' => $this->customer_id,
-            'tax'         => $this->tax,
-            'discount'    => $this->discount,
-            'grand_total' => $this->grand_total,
-            'final_total' => $this->final_total,
+            'po_no'        => PurchaseOrderNumberService::generate(),
+            'date'         => now(),
+            'quotation_id' => $this->id,
+            'customer_id'  => $this->customer_id,
+            'status'       => 'open',
+            'tax'          => $this->tax,
+            'discount'     => $this->discount,
+            'grand_total'  => $this->grand_total,
+            'final_total'  => $this->final_total,
         ]);
 
         foreach ($this->items as $item) {
@@ -59,16 +63,19 @@ class Quotation extends Model
         }
 
         $this->update([
-            'status'               => 'accepted',
-            'converted_to_sale_id' => $purchaseOrder->id,
+            'status'             => 'accepted',
+            'converted_to_po_id' => $purchaseOrder->id,  // correct FK → purchase_orders
         ]);
 
         return $purchaseOrder;
     }
 
+    // ─── Convert Quotation → Sales Invoice ───────────────────────────────────
+
     public function convertToSale(): Sale
     {
         $sale = Sale::create([
+            'sale_inv_no' => SaleInvoiceNumberService::generate(),
             'date'        => now(),
             'customer_id' => $this->customer_id,
             'tax'         => $this->tax,
@@ -88,7 +95,7 @@ class Quotation extends Model
 
         $this->update([
             'status'               => 'accepted',
-            'converted_to_sale_id' => $sale->id,
+            'converted_to_sale_id' => $sale->id,  // correct FK → sales
         ]);
 
         return $sale;

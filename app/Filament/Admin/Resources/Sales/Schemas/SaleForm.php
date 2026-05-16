@@ -17,17 +17,17 @@ class SaleForm
         $items = $get('items') ?? [];
 
         $subtotal = collect($items)->sum(function ($item, $index) use ($set) {
-            $qty = (float) ($item['qty'] ?? 0);
+            $qty   = (float) ($item['qty'] ?? 0);
             $price = (float) ($item['price'] ?? 0);
             $total = $qty * $price;
             $set("items.$index.total", $total);
             return $total;
         });
 
-        $taxRate = (float) ($get('tax') ?? 0);
+        $taxRate  = (float) ($get('tax') ?? 0);
         $discount = (float) ($get('discount') ?? 0);
-        $tax = $subtotal * ($taxRate / 100);
-        $final = max(0, $subtotal + $tax - $discount);
+        $tax      = $subtotal * ($taxRate / 100);
+        $final    = max(0, $subtotal + $tax - $discount);
 
         $set('grand_total', $subtotal);
         $set('final_total', $final);
@@ -37,14 +37,15 @@ class SaleForm
     {
         return $schema->components([
 
-            DatePicker::make('date')
-                ->default(now())
-                ->required(),
-
             TextInput::make('sale_inv_no')
+                ->label('Invoice No')
                 ->default(fn () => SaleInvoiceNumberService::generate())
                 ->disabled()
                 ->dehydrated(true),
+
+            DatePicker::make('date')
+                ->default(now())
+                ->required(),
 
             Select::make('customer_id')
                 ->label('Customer')
@@ -55,29 +56,20 @@ class SaleForm
                 ->searchable()
                 ->required(),
 
-            // TextInput::make('reference_no')
-            //     ->label('Reference No'),
-
             Repeater::make('items')
                 ->relationship()
                 ->schema([
                     Select::make('product_id')
-                        ->label('Product Name')
+                        ->label('Product')
                         ->options(Product::pluck('name', 'id'))
                         ->searchable()
                         ->live()
                         ->afterStateUpdated(function ($state, $set, $get) {
                             $product = Product::find($state);
-                            $set('category', $product?->category);
                             $set('price', $product?->price ?? 0);
                             self::recalculate($set, $get);
                         })
                         ->required(),
-
-                    Select::make('category')
-                        ->options(Product::getCategoryOptions())
-                        ->disabled()
-                        ->dehydrated(true),
 
                     TextInput::make('qty')
                         ->numeric()
@@ -90,7 +82,7 @@ class SaleForm
                             return function ($attribute, $value, $fail) use ($get) {
                                 $product = Product::find($get('product_id'));
                                 if ($product && $value > $product->stock) {
-                                    $fail('Not enough stock');
+                                    $fail('Not enough stock. Available: ' . $product->stock);
                                 }
                             };
                         }),
@@ -105,9 +97,11 @@ class SaleForm
 
                     TextInput::make('total')
                         ->numeric()
-                        ->disabled(),
+                        ->prefix('Rp ')
+                        ->disabled()
+                        ->dehydrated(true),
                 ])
-                ->columns(5)
+                ->columns(4)
                 ->columnSpanFull()
                 ->addActionLabel('Add Product')
                 ->afterStateUpdated(fn ($state, $set, $get) =>
@@ -118,10 +112,12 @@ class SaleForm
                 ),
 
             TextInput::make('grand_total')
+                ->label('Subtotal')
                 ->numeric()
                 ->prefix('Rp ')
                 ->columnStart(2)
-                ->disabled(),
+                ->disabled()
+                ->dehydrated(true),
 
             TextInput::make('tax')
                 ->label('Tax (%)')
@@ -143,10 +139,12 @@ class SaleForm
                 ),
 
             TextInput::make('final_total')
+                ->label('Final Total')
                 ->numeric()
                 ->prefix('Rp ')
                 ->columnStart(2)
-                ->disabled(),
+                ->disabled()
+                ->dehydrated(true),
         ]);
     }
 }

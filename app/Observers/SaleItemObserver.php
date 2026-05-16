@@ -8,7 +8,6 @@ class SaleItemObserver
 {
     public function created(SaleItem $item): void
     {
-        // $item->product()->decrement('stock', $item->qty);
         $qty = (float) ($item->qty ?? 0);
         if ($qty <= 0) return;
 
@@ -20,38 +19,28 @@ class SaleItemObserver
         // 2. Decrement stock
         $item->product->decrement('stock', $qty);
 
-        // 3. Recalculate sale totals now that items exist
+        // 3. Recalculate sale totals
         $item->sale->recalculateTotals();
     }
 
     public function updated(SaleItem $item): void
     {
-        // Apply only the difference when qty changes
-        // if ($item->wasChanged('qty')) {
-        //     $old = $item->getOriginal('qty');
-        //     $diff = $item->qty - $old;
-
-        //     if ($diff > 0) {
-        //         $item->product()->decrement('stock', $diff);
-        //     } elseif ($diff < 0) {
-        //         $item->product()->increment('stock', abs($diff));
-        //     }
-        // }
-
-        // $item->updateQuietly([
-        //     'cost_price' => $item->product->avg_cost,
-        // ]);
-
-        // $item->product->decrement('stock', $item->qty);
-
         $oldQty = (float) ($item->getOriginal('qty') ?? 0);
         $newQty = (float) ($item->qty ?? 0);
         $delta  = $newQty - $oldQty;
 
+        // Adjust stock by the difference
         if ($delta > 0) {
             $item->product->decrement('stock', $delta);
         } elseif ($delta < 0) {
             $item->product->increment('stock', abs($delta));
+        }
+
+        // Re-snapshot cost_price if product changed
+        if ($item->wasChanged('product_id') || $item->wasChanged('qty')) {
+            $item->updateQuietly([
+                'cost_price' => $item->product->avg_cost ?? 0,
+            ]);
         }
 
         $item->sale->recalculateTotals();
@@ -59,9 +48,7 @@ class SaleItemObserver
 
     public function deleted(SaleItem $item): void
     {
-        // $item->product()->increment('stock', $item->qty);
-
-        $qty = (float) ($saleItem->qty ?? 0);
+        $qty = (float) ($item->qty ?? 0);
         if ($qty > 0) {
             $item->product->increment('stock', $qty);
         }

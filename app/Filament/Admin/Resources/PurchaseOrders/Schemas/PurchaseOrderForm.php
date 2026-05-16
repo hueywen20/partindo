@@ -115,7 +115,7 @@ class PurchaseOrderForm
                     TextInput::make('price')
                         ->label('Unit Price')
                         ->numeric()
-                        ->prefix('RM ')
+                        ->prefix('IDR ')
                         ->live()
                         ->afterStateUpdated(fn ($state, $set, $get) =>
                             self::recalculate($set, $get)
@@ -123,7 +123,7 @@ class PurchaseOrderForm
 
                     TextInput::make('total')
                         ->numeric()
-                        ->prefix('RM ')
+                        ->prefix('IDR ')
                         ->disabled()
                         ->dehydrated(true),
                 ])
@@ -142,7 +142,7 @@ class PurchaseOrderForm
             TextInput::make('grand_total')
                 ->label('Subtotal')
                 ->numeric()
-                ->prefix('RM ')
+                ->prefix('IDR ')
                 ->columnStart(2)
                 ->disabled()
                 ->dehydrated(true),
@@ -169,7 +169,7 @@ class PurchaseOrderForm
             TextInput::make('final_total')
                 ->label('Final Total')
                 ->numeric()
-                ->prefix('RM ')
+                ->prefix('IDR ')
                 ->columnStart(2)
                 ->disabled()
                 ->dehydrated(true),

@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Services\PurchaseOrderNumberService;
+use App\Services\SaleInvoiceNumberService;
 
 class PurchaseOrder extends Model
 {
@@ -12,7 +12,7 @@ class PurchaseOrder extends Model
         'date',
         'quotation_id',
         'customer_id',
-        // 'supplier_id',
+        'supplier_id',
         'status',
         'tax',
         'discount',
@@ -53,6 +53,7 @@ class PurchaseOrder extends Model
     public function convertToSale(): Sale
     {
         $sale = Sale::create([
+            'sale_inv_no' => SaleInvoiceNumberService::generate(),
             'date'        => now(),
             'customer_id' => $this->customer_id,
             'tax'         => $this->tax,
@@ -75,7 +76,7 @@ class PurchaseOrder extends Model
             'converted_to_sale_id' => $sale->id,
         ]);
 
-        // also mark the originating quotation as accepted if linked
+        // Also mark the originating quotation as accepted if linked
         if ($this->quotation_id) {
             $this->quotation?->update([
                 'status'               => 'accepted',

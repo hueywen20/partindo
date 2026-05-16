@@ -8,6 +8,7 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use App\Models\Sale;
+use App\Filament\Admin\Resources\Sales\SaleResource;
 
 class SalesTable
 {
@@ -81,6 +82,7 @@ class SalesTable
             ->filters([
                 //
             ])
+            ->recordUrl(fn ($record) => SaleResource::getUrl('view', ['record' => $record]))
             ->recordActions([
                 EditAction::make(),
             ])
