@@ -6,8 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 use App\Services\PurchaseOrderNumberService;
 use App\Services\SaleInvoiceNumberService;
 
-class Quotation extends Model
+use OwenIt\Auditing\Contracts\Auditable;
+use OwenIt\Auditing\Auditable as AuditableTrait;
+
+class Quotation extends Model implements Auditable
 {
+    use AuditableTrait;
+
     protected $fillable = [
         'quotation_no', 'date', 'valid_until', 'customer_id',
         'status', 'tax', 'discount', 'grand_total', 'final_total',

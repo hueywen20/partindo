@@ -4,8 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Sale extends Model
+use OwenIt\Auditing\Contracts\Auditable;
+use OwenIt\Auditing\Auditable as AuditableTrait;
+
+class Sale extends Model implements Auditable
 {
+    use AuditableTrait;
+    
     protected $fillable = ['date',
     'sale_inv_no',
     'customer_id',

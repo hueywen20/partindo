@@ -4,9 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Purchase extends Model
+use OwenIt\Auditing\Contracts\Auditable;
+use OwenIt\Auditing\Auditable as AuditableTrait;
+
+class Purchase extends Model implements Auditable
 {
-    //
+    use AuditableTrait;
+
     protected $fillable = [
         'date',
         'supplier_id',
