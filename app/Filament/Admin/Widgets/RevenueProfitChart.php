@@ -20,7 +20,7 @@ class RevenueProfitChart extends ChartWidget
         /** @var User|null $user */
         $user = Auth::user();
 
-        return $user?->roles()->where('name', 'super_admin')->orWhere('name', 'admin')->exists() ?? false;
+        return $user?->roles()->where('name', 'super_admin')->orWhere('name', 'Admin')->exists() ?? false;
     }
 
     protected function getData(): array

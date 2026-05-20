@@ -28,10 +28,27 @@ class AppServiceProvider extends ServiceProvider
         PurchaseItem::observe(PurchaseItemObserver::class);
         SaleItem::observe(SaleItemObserver::class);
 
-        // super_admin bypasses ALL permission checks
+
+        // admin bypasses ALL permission checks
         // This is required for FilamentShieldPlugin to work correctly
         Gate::before(function ($user, $ability) {
-            return $user->hasRole('super_admin') ? true : null;
+            return $user->hasRole('Admin') ? true : null;
         });
+
+        // register policies for authorization
+        Gate::policy(\App\Models\Sale::class, \App\Policies\SalePolicy::class);
+        Gate::policy(\App\Models\Purchase::class, \App\Policies\PurchasePolicy::class);
+        Gate::policy(\App\Models\Customer::class, \App\Policies\CustomerPolicy::class);
+        Gate::policy(\App\Models\Supplier::class, \App\Policies\SupplierPolicy::class);
+        Gate::policy(\App\Models\Product::class, \App\Policies\ProductPolicy::class);
+        Gate::policy(\App\Models\Quotation::class, \App\Policies\QuotationPolicy::class);
+        Gate::policy(\App\Models\PurchaseOrder::class, \App\Policies\PurchaseOrderPolicy::class);
+        Gate::policy(\App\Models\ProductLocation::class, \App\Policies\ProductLocationPolicy::class);
+        Gate::policy(\App\Models\Brand::class, \App\Policies\BrandPolicy::class);
+        Gate::policy(\App\Models\Uom::class, \App\Policies\UomPolicy::class);
+        Gate::policy(\App\Models\User::class, \App\Policies\UserPolicy::class);
+        Gate::policy(\Spatie\Permission\Models\Role::class, \App\Policies\RolePolicy::class);
+        Gate::policy(\OwenIt\Auditing\Models\Audit::class, \App\Policies\AuditPolicy::class);
+        
     }
 }

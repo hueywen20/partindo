@@ -22,7 +22,7 @@ class FinancialOverview extends StatsOverviewWidget
         /** @var User|null $user */
         $user = Auth::user();
 
-        return $user?->roles()->where('name', 'super_admin')->orWhere('name', 'admin')->exists() ?? false;
+        return $user?->roles()->where('name', 'super_admin')->orWhere('name', 'Admin')->exists() ?? false;
     }
 
     protected function getStats(): array

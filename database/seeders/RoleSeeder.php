@@ -13,49 +13,66 @@ class RoleSeeder extends Seeder
         // ─── All permissions grouped by module ───────────────────────────────
         $modules = [
 
-            // ── Transactions ─────────────────────────────────────────────────
+            // ── Master Data ───────────────────────────────────────────────────
+            'customers' => [
+                'view_customer', 'create_customer', 'edit_customer', 'delete_customer',
+            ],
+            'suppliers' => [
+                'view_supplier', 'create_supplier', 'edit_supplier', 'delete_supplier',
+            ],
+            'brands' => [
+                'view_brand', 'create_brand', 'edit_brand', 'delete_brand',
+            ],
+            'uoms' => [
+                'view_uom', 'create_uom', 'edit_uom', 'delete_uom',
+            ],
+            'product_locations' => [
+                'view_product_location', 'create_product_location', 'edit_product_location', 'delete_product_location'
+            ],
+
+            // ── Inventory ─────────────────────────────────────────────────
+            'products' => [
+                'view_product', 'create_product', 'edit_product', 'delete_product',
+            ],
+
+            // ── Purchases ─────────────────────────────────────────────────
             'purchases' => [
-                'view_purchases', 'create_purchases', 'edit_purchases', 'delete_purchases',
+                'view_purchase', 'create_purchase', 'edit_purchase', 'delete_purchase',
             ],
+
+            // ── Sales ─────────────────────────────────────────────────
             'sales' => [
-                'view_sales', 'create_sales', 'edit_sales', 'delete_sales',
-                'open_sales_to_customer',
+                'view_sales', 'create_sales', 'edit_sales', 'delete_sales'            
             ],
+
             'quotations' => [
-                'view_quotations', 'create_quotations', 'edit_quotations', 'delete_quotations',
+                'view_quotation', 'create_quotation', 'edit_quotation', 'delete_quotation',
             ],
-            'purchase_returns' => [
-                'view_purchase_returns', 'create_purchase_returns', 'edit_purchase_returns', 'delete_purchase_returns',
-            ],
-            'sale_returns' => [
-                'view_sale_returns', 'create_sale_returns', 'edit_sale_returns', 'delete_sale_returns',
-            ],
+
+            // 'purchase_returns' => [
+            //     'view_purchase_returns', 'create_purchase_returns', 'edit_purchase_returns', 'delete_purchase_returns',
+            // ],
+
+            // 'sale_returns' => [
+            //     'view_sale_returns', 'create_sale_returns', 'edit_sale_returns', 'delete_sale_returns',
+            // ],
+
             'stock_adjustment_plus' => [
                 'view_stock_adjustment_plus', 'create_stock_adjustment_plus', 'edit_stock_adjustment_plus', 'delete_stock_adjustment_plus',
             ],
+
             'stock_adjustment_minus' => [
                 'view_stock_adjustment_minus', 'create_stock_adjustment_minus', 'edit_stock_adjustment_minus', 'delete_stock_adjustment_minus',
             ],
+
             'assembly' => [
                 'view_assembly', 'create_assembly', 'edit_assembly', 'delete_assembly',
             ],
+
             'de_assembly' => [
                 'view_de_assembly', 'create_de_assembly', 'edit_de_assembly', 'delete_de_assembly',
             ],
 
-            // ── Master Data ───────────────────────────────────────────────────
-            'customers' => [
-                'view_customers', 'create_customers', 'edit_customers', 'delete_customers',
-            ],
-            'suppliers' => [
-                'view_suppliers', 'create_suppliers', 'edit_suppliers', 'delete_suppliers',
-            ],
-            'products' => [
-                'view_products', 'create_products', 'edit_products', 'delete_products',
-            ],
-            'product_stock' => [
-                'view_product_list', 'view_stock_card',
-            ],
 
             // ── Finance ───────────────────────────────────────────────────────
             'receivables' => [
@@ -73,7 +90,7 @@ class RoleSeeder extends Seeder
 
             // ── Settings ──────────────────────────────────────────────────────
             'users' => [
-                'view_users', 'create_users', 'edit_users', 'delete_users',
+                'view_user', 'create_user', 'edit_user', 'delete_user',
             ],
             'user_groups' => [
                 'view_user_groups', 'create_user_groups', 'edit_user_groups', 'delete_user_groups',
@@ -84,6 +101,7 @@ class RoleSeeder extends Seeder
             'roles_permissions' => [
                 'view_roles_permissions', 'manage_roles_permissions',
             ],
+            'audit' => ['view_audit'],
 
             // ── Reports ───────────────────────────────────────────────────────
             'report_stock' => [

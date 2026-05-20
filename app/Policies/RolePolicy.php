@@ -11,65 +11,17 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 class RolePolicy
 {
     use HandlesAuthorization;
-    
-    public function viewAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('ViewAny:Role');
-    }
 
-    public function view(AuthUser $authUser, Role $role): bool
-    {
-        return $authUser->can('View:Role');
-    }
-
-    public function create(AuthUser $authUser): bool
-    {
-        return $authUser->can('Create:Role');
-    }
-
-    public function update(AuthUser $authUser, Role $role): bool
-    {
-        return $authUser->can('Update:Role');
-    }
-
-    public function delete(AuthUser $authUser, Role $role): bool
-    {
-        return $authUser->can('Delete:Role');
-    }
-
-    public function deleteAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('DeleteAny:Role');
-    }
-
-    public function restore(AuthUser $authUser, Role $role): bool
-    {
-        return $authUser->can('Restore:Role');
-    }
-
-    public function forceDelete(AuthUser $authUser, Role $role): bool
-    {
-        return $authUser->can('ForceDelete:Role');
-    }
-
-    public function forceDeleteAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('ForceDeleteAny:Role');
-    }
-
-    public function restoreAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('RestoreAny:Role');
-    }
-
-    public function replicate(AuthUser $authUser, Role $role): bool
-    {
-        return $authUser->can('Replicate:Role');
-    }
-
-    public function reorder(AuthUser $authUser): bool
-    {
-        return $authUser->can('Reorder:Role');
-    }
-
+    public function viewAny(AuthUser $authUser): bool { return $authUser->can('view_roles_permissions'); }
+    public function view(AuthUser $authUser, Role $role): bool { return $authUser->can('view_roles_permissions'); }
+    public function create(AuthUser $authUser): bool { return $authUser->can('manage_roles_permissions'); }
+    public function update(AuthUser $authUser, Role $role): bool { return $authUser->can('manage_roles_permissions'); }
+    public function delete(AuthUser $authUser, Role $role): bool { return $authUser->can('manage_roles_permissions'); }
+    public function deleteAny(AuthUser $authUser): bool { return $authUser->can('manage_roles_permissions'); }
+    public function restore(AuthUser $authUser, Role $role): bool { return false; }
+    public function forceDelete(AuthUser $authUser, Role $role): bool { return false; }
+    public function forceDeleteAny(AuthUser $authUser): bool { return false; }
+    public function restoreAny(AuthUser $authUser): bool { return false; }
+    public function replicate(AuthUser $authUser, Role $role): bool { return false; }
+    public function reorder(AuthUser $authUser): bool { return false; }
 }
