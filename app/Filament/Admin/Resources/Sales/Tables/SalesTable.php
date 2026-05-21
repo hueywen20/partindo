@@ -16,6 +16,8 @@ class SalesTable
     {
         return $table
             ->columns([
+                TextColumn::make('No.')
+                    ->rowIndex(),
                 TextColumn::make('date')
                     ->date()
                     ->sortable(),
@@ -28,22 +30,22 @@ class SalesTable
                     ->sortable(),
                 TextColumn::make('final_total')
                     ->label('Amount')
-                    ->numeric()
                     ->prefix('Rp ')
+                    ->currency()
                     ->sortable(),
-                 TextColumn::make('gross_profit')
+                TextColumn::make('gross_profit')
                     ->label('Gross Profit')
-                    ->getStateUsing(function (Sale $record): string {
-                        $profit = $record->items->sum(
+                    ->getStateUsing(function (Sale $record): float {
+                        return $record->items->sum(
                             fn($item) => ((float)$item->price - (float)$item->cost_price) * (float)$item->qty
                         );
-                        return 'Rp ' . number_format($profit, 0, '.', ',');
                     })
+                    ->prefix('Rp ')
+                    ->currency()
                     ->color(fn (Sale $record) =>
                         $record->items->sum(fn($i) => ((float)$i->price - (float)$i->cost_price) * (float)$i->qty) >= 0
                             ? 'success' : 'danger'
                     ),
-
                 TextColumn::make('margin_pct')
                     ->label('Margin %')
                     ->getStateUsing(function (Sale $record): string {
@@ -71,11 +73,11 @@ class SalesTable
                 //         return number_format((($revenue - $cogs) / $revenue) * 100, 1) . '%';
                 //     }),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->dateTime('d-m-Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->dateTime('d-m-Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

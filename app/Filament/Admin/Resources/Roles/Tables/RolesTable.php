@@ -14,6 +14,8 @@ class RolesTable
     {
         return $table
             ->columns([
+                TextColumn::make('No.')
+                    ->rowIndex(),
                 TextColumn::make('name')
                     ->label('Nama Role')
                     ->searchable()
@@ -32,7 +34,7 @@ class RolesTable
                     ->color('info'),
 
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->dateTime('d-m-Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

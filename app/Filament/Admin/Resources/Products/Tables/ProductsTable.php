@@ -22,6 +22,36 @@ class ProductsTable
     {
         return $table
             ->columns([
+                TextColumn::make('No')
+                    ->rowIndex(),
+
+                TextColumn::make('code')
+                    ->label('Part No.')
+                    ->getStateUsing(function ($record) {
+                        if (blank($record->code)) return [];
+
+                        return collect(explode("\n", $record->code))
+                            ->map(fn ($line) => trim($line))
+                            ->filter()
+                            ->values()
+                            // ->join(', ');
+                            ->all();
+                    })
+                    ->listWithLineBreaks()
+                    ->searchable(query: function ($query, string $search) {
+                        $normalized = str_replace([' ', '-'], '', $search); // "P10", "0951577"
+
+                        $query->where(function ($q) use ($search, $normalized) {
+                            $q->where('code', 'like', "%{$search}%")
+                            ->orWhereRaw("REPLACE(REPLACE(code, ' ', ''), '-', '') LIKE ?", ["%{$normalized}%"]);
+                        });
+                    })
+                    ->sortable()
+                    ->limitList(3)
+                    ->badge()
+                    ->expandableLimitedList(),
+
+                
                 TextColumn::make('name')
                     ->searchable(query: function ($query, $search) {
                         $query->where('name', 'like', "%{$search}%");
@@ -36,7 +66,17 @@ class ProductsTable
                     ->sortable(),
                 TextColumn::make('stock')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->color(function ($record) {
+                        if ($record->stock <= 0) return 'danger';
+                        if ($record->track_low_stock && $record->stock < $record->min_stock_threshold) return 'warning';
+                        return 'success';
+                    })
+                    ->icon(function ($record) {
+                        if ($record->stock <= 0) return 'heroicon-m-x-circle';
+                        if ($record->track_low_stock && $record->stock < $record->min_stock_threshold) return 'heroicon-m-exclamation-triangle';
+                        return null;
+                    }),
                 TextColumn::make('uomModel.name')
                     ->label('UOM')
                     ->searchable()
@@ -61,32 +101,18 @@ class ProductsTable
                     })
                     ->listWithLineBreaks()
                     ->badge()
-                    ->limitList(3)
-                    ->expandableLimitedList(),
-
-
-                TextColumn::make('category')
-                    ->formatStateUsing(fn ($state) => Product::getCategoryOptions()[$state] ?? $state)
                     ->searchable()
-                    ->sortable(),
-              
-                TextColumn::make('code')
-                    ->label('Part No.')
-                    ->getStateUsing(function ($record) {
-                        if (blank($record->code)) return [];
-
-                        return collect(explode("\n", $record->code))
-                            ->map(fn ($line) => trim($line))
-                            ->filter()
-                            ->values()
-                            // ->join(', ');
-                            ->all();
-                    })
-                    ->listWithLineBreaks()
+                    ->sortable()
                     ->limitList(3)
-                    ->badge()
                     ->expandableLimitedList(),
 
+
+                // TextColumn::make('category')
+                //     ->formatStateUsing(fn ($state) => Product::getCategoryOptions()[$state] ?? $state)
+                //     ->searchable()
+                //     ->sortable(),
+              
+                
                 TextColumn::make('created_by')
                     ->label('Created By')
                     ->sortable()
@@ -110,11 +136,11 @@ class ProductsTable
                 //     ->limitList(3)
                 //     ->expandableLimitedList(),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->dateTime('d-m-Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->dateTime('d-m-Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -152,9 +178,22 @@ class ProductsTable
                     }),
 
                 // Select filter for category
-                SelectFilter::make('category')
-                    ->options(Product::getCategoryOptions())
-                    ->placeholder('All Categories'),
+                SelectFilter::make('brand')
+                    ->options(Product::getBrandOptions())
+                    ->placeholder('All Brands'),
+                
+                Filter::make('low_stock')
+                    ->label('Low Stock')
+                    ->query(fn (Builder $query) => $query
+                        ->where('track_low_stock', true)
+                        ->whereColumn('stock', '<', 'min_stock_threshold')
+                    )
+                    ->toggle(),
+
+                Filter::make('out_of_stock')
+                    ->label('Out of Stock')
+                    ->query(fn (Builder $query) => $query->where('stock', '<=', 0))
+                    ->toggle(),
             ])
             ->filtersFormColumns(3) // Show all 3 filters side by side
             ->recordUrl(fn ($record) => ProductResource::getUrl('view', ['record' => $record]))

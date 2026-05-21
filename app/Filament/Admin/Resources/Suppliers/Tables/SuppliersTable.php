@@ -15,6 +15,8 @@ class SuppliersTable
     {
         return $table
             ->columns([
+                TextColumn::make('No.')
+                    ->rowIndex(),
                 TextColumn::make('supplier_name')
                     ->searchable(),
                 TextColumn::make('company_name')
@@ -26,11 +28,11 @@ class SuppliersTable
                 IconColumn::make('status')
                     ->boolean(),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->dateTime('d-m-Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->dateTime('d-m-Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

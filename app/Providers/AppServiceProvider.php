@@ -8,6 +8,8 @@ use App\Observers\PurchaseItemObserver;
 use App\Models\SaleItem;
 use App\Observers\SaleItemObserver;
 use Illuminate\Support\Facades\Gate;
+use Filament\Tables\Columns\TextColumn;
+ 
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -49,6 +51,11 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(\App\Models\User::class, \App\Policies\UserPolicy::class);
         Gate::policy(\Spatie\Permission\Models\Role::class, \App\Policies\RolePolicy::class);
         Gate::policy(\OwenIt\Auditing\Models\Audit::class, \App\Policies\AuditPolicy::class);
+
+        TextColumn::macro('currency', function () {
+            /** @var TextColumn $this */
+            return $this->formatStateUsing(fn ($state) => number_format($state, 2, ',', '.'));
+        });
         
     }
 }

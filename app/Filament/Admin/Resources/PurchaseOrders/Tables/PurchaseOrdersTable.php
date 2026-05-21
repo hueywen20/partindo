@@ -18,6 +18,9 @@ class PurchaseOrdersTable
     {
         return $table
             ->columns([
+                TextColumn::make('No.')
+                    ->rowIndex(),
+
                 TextColumn::make('po_no')
                     ->label('PO Number')
                     ->searchable()
@@ -44,7 +47,7 @@ class PurchaseOrdersTable
 
                 TextColumn::make('final_total')
                     ->label('Total')
-                    ->numeric(decimalPlaces: 2)
+                    ->currency()
                     ->prefix('Rp ')
                     ->sortable(),
 
@@ -59,7 +62,7 @@ class PurchaseOrdersTable
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->dateTime('d-m-Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

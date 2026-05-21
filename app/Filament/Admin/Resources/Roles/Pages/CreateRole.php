@@ -14,4 +14,9 @@ class CreateRole extends CreateRecord
     {
         RoleForm::syncPermissions($this->record, $this->data);
     }
+
+     protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

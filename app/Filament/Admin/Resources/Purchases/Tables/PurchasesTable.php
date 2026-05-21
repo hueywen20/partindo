@@ -15,6 +15,8 @@ class PurchasesTable
     {
         return $table
             ->columns([
+                TextColumn::make('No.')
+                    ->rowIndex(),
                 TextColumn::make('date')
                     ->date()
                     ->sortable(),
@@ -30,11 +32,11 @@ class PurchasesTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->dateTime('d-m-Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->dateTime('d-m-Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

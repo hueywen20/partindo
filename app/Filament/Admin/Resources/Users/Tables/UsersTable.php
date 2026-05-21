@@ -14,6 +14,8 @@ class UsersTable
     {
         return $table
             ->columns([
+                TextColumn::make('No.')
+                    ->rowIndex(),
                 TextColumn::make('name')
                     ->searchable(),
                 TextColumn::make('email')
@@ -27,11 +29,11 @@ class UsersTable
                     ->badge()
                     ->separator(','),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->dateTime('d-m-Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->dateTime('d-m-Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

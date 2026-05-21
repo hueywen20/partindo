@@ -88,16 +88,16 @@ class SaleForm
                         }),
 
                     TextInput::make('price')
-                        ->numeric()
                         ->prefix('Rp ')
+                        ->currency()
                         ->live()
                         ->afterStateUpdated(fn ($state, $set, $get) =>
                             self::recalculate($set, $get)
                         ),
 
                     TextInput::make('total')
-                        ->numeric()
                         ->prefix('Rp ')
+                        ->currency()
                         ->disabled()
                         ->dehydrated(true),
                 ])
@@ -113,8 +113,8 @@ class SaleForm
 
             TextInput::make('grand_total')
                 ->label('Subtotal')
-                ->numeric()
                 ->prefix('Rp ')
+                ->currency()
                 ->columnStart(2)
                 ->disabled()
                 ->dehydrated(true),
@@ -140,8 +140,8 @@ class SaleForm
 
             TextInput::make('final_total')
                 ->label('Final Total')
-                ->numeric()
                 ->prefix('Rp ')
+                ->currency()
                 ->columnStart(2)
                 ->disabled()
                 ->dehydrated(true),

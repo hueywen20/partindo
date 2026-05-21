@@ -38,6 +38,8 @@ class AuditLogsResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('No.')
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Date & Time')
                     ->dateTime('d M Y, H:i:s')

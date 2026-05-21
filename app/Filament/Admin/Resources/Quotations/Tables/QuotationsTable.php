@@ -18,6 +18,8 @@ class QuotationsTable
     {
         return $table
             ->columns([
+                TextColumn::make('No.')
+                    ->rowIndex(),
                 TextColumn::make('quotation_no')
                     ->label('Quotation No')
                     ->searchable()
@@ -39,7 +41,7 @@ class QuotationsTable
 
                 TextColumn::make('final_total')
                     ->label('Total')
-                    ->numeric(decimalPlaces: 2)
+                    ->currency()
                     ->prefix('Rp ')
                     ->sortable(),
 

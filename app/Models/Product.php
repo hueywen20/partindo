@@ -23,6 +23,8 @@ class Product extends Model implements Auditable
         'brand',
         'category',
         'code',
+        'track_low_stock',
+        'min_stock_threshold',
         'created_by',
         'updated_by',
 
@@ -122,6 +124,12 @@ class Product extends Model implements Auditable
     public function locationModel()
     {
         return $this->belongsTo(\App\Models\ProductLocation::class, 'location');
+    }
+
+    public function scopeLowStock($query)
+    {
+        return $query->where('track_low_stock', true)
+                    ->whereColumn('stock', '<', 'min_stock_threshold');
     }
 
     // public function codes()

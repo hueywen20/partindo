@@ -109,8 +109,8 @@ class PurchaseForm
                         ),
 
                     TextInput::make('price')
-                        ->numeric()
                         ->prefix('Rp ')
+                        ->currency()
                         ->live()
                         ->afterStateUpdated(fn ($state, $set, $get) =>
                             self::recalculate($set, $get)
@@ -136,8 +136,8 @@ class PurchaseForm
                 // =====================
             
             TextInput::make('grand_total')
-                ->numeric()
                 ->prefix('Rp ')
+                ->currency()
                 ->columnStart(2)
                 ->disabled(),
 
@@ -161,8 +161,8 @@ class PurchaseForm
                 ),
 
             TextInput::make('final_total')
-                ->numeric()
                 ->prefix('Rp ')
+                ->currency()
                 ->columnStart(2)
                 ->disabled(),
         ]);

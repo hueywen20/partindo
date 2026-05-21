@@ -14,31 +14,31 @@ class RoleForm
     private static array $modules = [
          // ── Master Data ───────────────────────────────────────────────────────
         'Customers' => [
-            'view_customer', 'create_customer', 'edit_customer', 'delete_customer',
+            'view_customers', 'create_customers', 'edit_customers', 'delete_customers',
         ],
         'Suppliers' => [
-            'view_supplier', 'create_supplier', 'edit_supplier', 'delete_supplier',
+            'view_suppliers', 'create_suppliers', 'edit_suppliers', 'delete_suppliers',
         ],
         'Brands' => [
-            'view_brand', 'create_brand', 'edit_brand', 'delete_brand',
+            'view_brands', 'create_brands', 'edit_brands', 'delete_brands',
         ],
         'UOMs' => [
-            'view_uom', 'create_uom', 'edit_uom', 'delete_uom',
+            'view_uoms', 'create_uoms', 'edit_uoms', 'delete_uoms',
         ],
         'Product Locations' => [
-            'view_product_location', 'create_product_location', 'edit_product_location', 'delete_product_location',
+            'view_product_locations', 'create_product_locations', 'edit_product_locations', 'delete_product_locations',
         ],
 
         // -- Inventory ─────────────────────────────────────────────────────────
         'Products' => [
-            'view_product', 'create_product', 'edit_product', 'delete_product',
+            'view_products', 'create_products', 'edit_products', 'delete_products',
         ],
 
         // ── Transactions ──────────────────────────────────────────────────────
    
         // -- Sales & Purchases ─────────────────────────────────────────────────────
         'Quotations' => [
-            'view_quotation', 'create_quotation', 'edit_quotation', 'delete_quotation',
+            'view_quotations', 'create_quotations', 'edit_quotations', 'delete_quotations',
         ],
         'Purchase Orders' => [
             'view_purchase_orders', 'create_purchase_orders', 'edit_purchase_orders', 'delete_purchase_orders',

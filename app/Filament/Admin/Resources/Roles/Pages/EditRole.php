@@ -22,4 +22,9 @@ class EditRole extends EditRecord
     {
         RoleForm::syncPermissions($this->record, $this->data);
     }
+
+     protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }
