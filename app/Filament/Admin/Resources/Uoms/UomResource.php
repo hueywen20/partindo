@@ -23,6 +23,9 @@ class UomResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'Master';
 
+    protected static ?string $navigationLabel = 'UOMs';
+
+
     public static function form(Schema $schema): Schema
     {
         return UomForm::configure($schema);

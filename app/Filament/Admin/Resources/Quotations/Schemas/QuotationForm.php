@@ -88,7 +88,9 @@ class QuotationForm
                         }),
 
                     TextInput::make('qty')
+                        ->label('Quantity')
                         ->numeric()
+                        ->minValue(1)
                         ->default(1)
                         ->live()
                         ->afterStateUpdated(fn ($state, $set, $get) =>

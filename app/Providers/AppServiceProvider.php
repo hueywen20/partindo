@@ -9,6 +9,7 @@ use App\Models\SaleItem;
 use App\Observers\SaleItemObserver;
 use Illuminate\Support\Facades\Gate;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
  
 
 class AppServiceProvider extends ServiceProvider
@@ -55,6 +56,27 @@ class AppServiceProvider extends ServiceProvider
         TextColumn::macro('currency', function () {
             /** @var TextColumn $this */
             return $this->formatStateUsing(fn ($state) => number_format($state, 2, ',', '.'));
+        });
+
+        // TextInput::macro('currency', function () {
+        //     /** @var TextInput $this */
+        //     return $this
+        //         ->prefix('Rp')
+        //         ->extraInputAttributes(['inputmode' => 'numeric'])
+        //         ->formatStateUsing(fn ($state) => $state ? number_format((float) $state, 2, ',', '.') : '')
+        //         ->dehydrateStateUsing(fn ($state) => $state ? (float) str_replace(['.', ','], ['', '.'], $state) : null);
+        // });
+
+        TextInput::macro('currency', function () {
+            /** @var TextInput $this */
+            return $this
+                ->prefix('Rp')
+                ->extraInputAttributes(['inputmode' => 'numeric'])
+                ->extraAlpineAttributes([
+                    'x-mask:dynamic' => '$money($input, \',\', \'.\', 2)',
+                ])
+                ->formatStateUsing(fn ($state) => $state ? number_format((float) $state, 2, ',', '.') : '')
+                ->dehydrateStateUsing(fn ($state) => $state ? (float) str_replace(['.', ','], ['', '.'], $state) : null);
         });
         
     }

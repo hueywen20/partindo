@@ -99,13 +99,15 @@ class PurchaseOrderForm
                         })
                         ->required(),
 
-                    Select::make('category')
-                        ->options(Product::getCategoryOptions())
-                        ->disabled()
-                        ->dehydrated(true),
+                    // Select::make('category')
+                    //     ->options(Product::getCategoryOptions())
+                    //     ->disabled()
+                    //     ->dehydrated(true),
 
                     TextInput::make('qty')
+                        ->label('Quantity')
                         ->numeric()
+                        ->minValue(1)
                         ->default(1)
                         ->live()
                         ->afterStateUpdated(fn ($state, $set, $get) =>
@@ -115,7 +117,7 @@ class PurchaseOrderForm
                     TextInput::make('price')
                         ->label('Unit Price')
                         ->numeric()
-                        ->prefix('IDR ')
+                        ->prefix('Rp  ')
                         ->live()
                         ->afterStateUpdated(fn ($state, $set, $get) =>
                             self::recalculate($set, $get)
@@ -123,7 +125,7 @@ class PurchaseOrderForm
 
                     TextInput::make('total')
                         ->numeric()
-                        ->prefix('IDR ')
+                        ->prefix('Rp  ')
                         ->disabled()
                         ->dehydrated(true),
                 ])
@@ -142,7 +144,7 @@ class PurchaseOrderForm
             TextInput::make('grand_total')
                 ->label('Subtotal')
                 ->numeric()
-                ->prefix('IDR ')
+                ->prefix('Rp  ')
                 ->columnStart(2)
                 ->disabled()
                 ->dehydrated(true),
@@ -169,7 +171,7 @@ class PurchaseOrderForm
             TextInput::make('final_total')
                 ->label('Final Total')
                 ->numeric()
-                ->prefix('IDR ')
+                ->prefix('Rp  ')
                 ->columnStart(2)
                 ->disabled()
                 ->dehydrated(true),

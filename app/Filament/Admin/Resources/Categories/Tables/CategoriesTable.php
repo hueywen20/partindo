@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Purchases\Tables;
+namespace App\Filament\Admin\Resources\Categories\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use App\Filament\Admin\Resources\Purchases\PurchaseResource;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 
-class PurchasesTable
+class CategoriesTable
 {
     public static function configure(Table $table): Table
     {
@@ -17,20 +17,13 @@ class PurchasesTable
             ->columns([
                 TextColumn::make('No.')
                     ->rowIndex(),
-                TextColumn::make('date')
-                    ->date()
-                    ->sortable(),
-                TextColumn::make('purchase_inv_no')
-                    ->label('Purchase Invoice No.')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('supplier.company_name')
-                    ->label('Supplier')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('reference_no')
-                    ->searchable()
-                    ->sortable(),
+                TextColumn::make('name')
+                    ->sortable()
+                    ->searchable(),
+                IconColumn::make('status')
+                    ->boolean(),
+                TextColumn::make('created_by')
+                    ->searchable(),
                 TextColumn::make('created_at')
                     ->dateTime('d-m-Y H:i:s')
                     ->sortable()
@@ -40,12 +33,9 @@ class PurchasesTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('purchase_inv_no', 'desc')
-
             ->filters([
                 //
             ])
-            ->recordUrl(fn ($record) => PurchaseResource::getUrl('view', ['record' => $record]))
             ->recordActions([
                 EditAction::make(),
             ])
