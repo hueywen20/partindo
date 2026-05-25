@@ -40,21 +40,15 @@ class ProductForm
                     ->searchable()
                     ->required(),
                 
-                // Select::make('category')
-                //     ->label('Category')
-                //     ->options(Product::getCategoryOptions()),
-                    // ->required(),
-                // Textarea::make('unit')
-                //     ->label('Unit Description')
-                //     ->rows(5)
-                //     ->placeholder('XZ110'),   
-                // Textarea::make('code')
-                //     ->label('Related Part Numbers')
-                //     ->rows(10)
-                //     ->placeholder('Enter related part numbers here...'),
+                Select::make('category')
+                    ->label('Category')
+                    // ->options(Product::getCategoryOptions())
+                    ->options(fn () => \App\Models\Category::where('status', true)->pluck('name', 'id'))
+                    ->searchable(),
+
                 Textarea::make('unit')
                     ->label('Unit')
-                    ->rows(10)
+                    ->rows(3)
                     ->placeholder("sample: XZ110\nXZ120\nXZ130"),
 
                 Textarea::make('code')

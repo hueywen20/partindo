@@ -60,10 +60,21 @@ class ProductsTable
                             // });
                     })
                     ->sortable(),
+                    
                 TextColumn::make('brandModel.name')
                     ->label('Brand')
+                    ->badge()
+                    ->color('secondary')
                     ->searchable()
                     ->sortable(),
+
+                TextColumn::make('categoryModel.name')
+                    ->label('Category')
+                    ->badge()
+                    ->color('info')
+                    ->searchable()
+                    ->sortable(),
+
                 TextColumn::make('stock')
                     ->numeric()
                     ->sortable()
@@ -177,7 +188,12 @@ class ProductsTable
                         }
                     }),
 
-                // Select filter for category
+                 // Text filter for category
+                SelectFilter::make('category')
+                    ->options(Product::getCategoryOptions())
+                    ->placeholder('All Categories'),
+
+                // Select filter for brand
                 SelectFilter::make('brand')
                     ->options(Product::getBrandOptions())
                     ->placeholder('All Brands'),

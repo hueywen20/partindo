@@ -14,7 +14,7 @@ class ViewProduct extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-             Action::make('back')
+            Action::make('back')
                 ->label('Back')
                 ->url($this->getResource()::getUrl('index'))
                 ->color('gray')
