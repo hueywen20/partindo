@@ -15,6 +15,7 @@ use Filament\Actions\ViewAction;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Admin\Resources\Products\Tables\Pages\ViewProduct;
 use App\Filament\Admin\Resources\Products\ProductResource;
+use Filament\Actions\ReplicateAction;
 
 class ProductsTable
 {
@@ -214,6 +215,15 @@ class ProductsTable
             ->filtersFormColumns(3) // Show all 3 filters side by side
             ->recordUrl(fn ($record) => ProductResource::getUrl('view', ['record' => $record]))
             ->recordActions([
+                 ReplicateAction::make()
+                    ->label('Clone')
+                    ->modalSubmitActionLabel('Clone product')
+                    ->successNotificationTitle('Product cloned')
+                    ->beforeReplicaSaved(fn (Product $replica) => $replica->forceFill([
+                        'stock' => 0,
+                        'avg_cost' => 0,
+                    ]))
+                    ->successRedirectUrl(fn (Product $replica): string => ProductResource::getUrl('edit', ['record' => $replica])),
                 EditAction::make(),
             ])
             ->toolbarActions([

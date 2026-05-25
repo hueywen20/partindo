@@ -46,7 +46,7 @@ class ProductResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            \App\Filament\Admin\Resources\Products\RelationManagers\StockLedgerRelationManager::class,
         ];
     }
  

@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 
 use OwenIt\Auditing\Contracts\Auditable;
 use OwenIt\Auditing\Auditable as AuditableTrait;
+use App\Models\PurchaseItem;
+use App\Models\SaleItem;
 
 class Product extends Model implements Auditable
 {
@@ -100,6 +102,16 @@ class Product extends Model implements Auditable
     {
         return $query->where('track_low_stock', true)
                     ->whereColumn('stock', '<', 'min_stock_threshold');
+    }
+
+    public function purchaseItems()
+    {
+        return $this->hasMany(PurchaseItem::class);
+    }
+
+    public function saleItems()
+    {
+        return $this->hasMany(SaleItem::class);
     }
 
     // public function codes()

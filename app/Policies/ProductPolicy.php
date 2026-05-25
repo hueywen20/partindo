@@ -22,6 +22,6 @@ class ProductPolicy
     public function forceDelete(AuthUser $authUser, Product $product): bool { return false; }
     public function forceDeleteAny(AuthUser $authUser): bool { return false; }
     public function restoreAny(AuthUser $authUser): bool { return false; }
-    public function replicate(AuthUser $authUser, Product $product): bool { return false; }
+    public function replicate(AuthUser $authUser, Product $product): bool { return $authUser->can('create_products'); }
     public function reorder(AuthUser $authUser): bool { return false; }
 }
