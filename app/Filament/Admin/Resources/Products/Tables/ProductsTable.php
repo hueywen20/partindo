@@ -2,20 +2,18 @@
 
 namespace App\Filament\Admin\Resources\Products\Tables;
 
+use App\Filament\Admin\Resources\Products\ProductResource;
+use App\Models\Product;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ReplicateAction;
+use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Forms\Components\TextInput;
 use Filament\Tables\Table;
-use App\Models\Product;
-use Filament\Actions\ViewAction;
 use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Admin\Resources\Products\Tables\Pages\ViewProduct;
-use App\Filament\Admin\Resources\Products\ProductResource;
-use Filament\Actions\ReplicateAction;
 
 class ProductsTable
 {
@@ -35,16 +33,15 @@ class ProductsTable
                             ->map(fn ($line) => trim($line))
                             ->filter()
                             ->values()
-                            // ->join(', ');
                             ->all();
                     })
                     ->listWithLineBreaks()
                     ->searchable(query: function ($query, string $search) {
-                        $normalized = str_replace([' ', '-'], '', $search); // "P10", "0951577"
+                        $normalized = str_replace([' ', '-'], '', $search);
 
                         $query->where(function ($q) use ($search, $normalized) {
                             $q->where('code', 'like', "%{$search}%")
-                            ->orWhereRaw("REPLACE(REPLACE(code, ' ', ''), '-', '') LIKE ?", ["%{$normalized}%"]);
+                                ->orWhereRaw("REPLACE(REPLACE(code, ' ', ''), '-', '') LIKE ?", ["%{$normalized}%"]);
                         });
                     })
                     ->sortable()
@@ -52,16 +49,12 @@ class ProductsTable
                     ->badge()
                     ->expandableLimitedList(),
 
-                
                 TextColumn::make('name')
                     ->searchable(query: function ($query, $search) {
                         $query->where('name', 'like', "%{$search}%");
-                            // ->orWhereHas('codes', function ($q) use ($search) {
-                                // $q->where('code', 'like', "%{$search}%");
-                            // });
                     })
                     ->sortable(),
-                    
+
                 TextColumn::make('brandModel.name')
                     ->label('Brand')
                     ->badge()
@@ -82,22 +75,25 @@ class ProductsTable
                     ->color(function ($record) {
                         if ($record->stock <= 0) return 'danger';
                         if ($record->track_low_stock && $record->stock < $record->min_stock_threshold) return 'warning';
+
                         return 'success';
                     })
                     ->icon(function ($record) {
                         if ($record->stock <= 0) return 'heroicon-m-x-circle';
                         if ($record->track_low_stock && $record->stock < $record->min_stock_threshold) return 'heroicon-m-exclamation-triangle';
+
                         return null;
                     }),
+
                 TextColumn::make('uomModel.name')
                     ->label('UOM')
                     ->searchable()
                     ->sortable(),
+
                 TextColumn::make('locationModel.name')
                     ->label('Location')
                     ->searchable()
                     ->sortable(),
-               
 
                 TextColumn::make('unit')
                     ->label('Unit')
@@ -108,7 +104,6 @@ class ProductsTable
                             ->map(fn ($line) => trim($line))
                             ->filter()
                             ->values()
-                            // ->join(', ');
                             ->all();
                     })
                     ->listWithLineBreaks()
@@ -118,13 +113,6 @@ class ProductsTable
                     ->limitList(3)
                     ->expandableLimitedList(),
 
-
-                // TextColumn::make('category')
-                //     ->formatStateUsing(fn ($state) => Product::getCategoryOptions()[$state] ?? $state)
-                //     ->searchable()
-                //     ->sortable(),
-              
-                
                 TextColumn::make('created_by')
                     ->label('Created By')
                     ->sortable()
@@ -135,29 +123,17 @@ class ProductsTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
-
-
-                // TextColumn::make('codes_display')
-                //     ->label('Part No.')
-                //     ->getStateUsing(fn (Product $record) =>
-                //         $record->codes
-                //             ->map(fn ($code) => "{$code->brand}: {$code->code}")
-                //             ->toArray()
-                //     )
-                //     ->listWithLineBreaks()
-                //     ->limitList(3)
-                //     ->expandableLimitedList(),
                 TextColumn::make('created_at')
                     ->dateTime('d-m-Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('updated_at')
                     ->dateTime('d-m-Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                // Text filter for name
                 Filter::make('name')
                     ->schema([
                         TextInput::make('name')->placeholder('Search name...'),
@@ -173,7 +149,6 @@ class ProductsTable
                         }
                     }),
 
-                // Text filter for location
                 Filter::make('location')
                     ->schema([
                         TextInput::make('location')->placeholder('Filter by location...'),
@@ -189,16 +164,14 @@ class ProductsTable
                         }
                     }),
 
-                 // Text filter for category
                 SelectFilter::make('category')
                     ->options(Product::getCategoryOptions())
                     ->placeholder('All Categories'),
 
-                // Select filter for brand
                 SelectFilter::make('brand')
                     ->options(Product::getBrandOptions())
                     ->placeholder('All Brands'),
-                
+
                 Filter::make('low_stock')
                     ->label('Low Stock')
                     ->query(fn (Builder $query) => $query
@@ -212,10 +185,11 @@ class ProductsTable
                     ->query(fn (Builder $query) => $query->where('stock', '<=', 0))
                     ->toggle(),
             ])
-            ->filtersFormColumns(3) // Show all 3 filters side by side
+            ->filtersFormColumns(3)
+            ->defaultSort('code', 'asc')
             ->recordUrl(fn ($record) => ProductResource::getUrl('view', ['record' => $record]))
             ->recordActions([
-                 ReplicateAction::make()
+                ReplicateAction::make()
                     ->label('Clone')
                     ->modalSubmitActionLabel('Clone product')
                     ->successNotificationTitle('Product cloned')
@@ -224,6 +198,7 @@ class ProductsTable
                         'avg_cost' => 0,
                     ]))
                     ->successRedirectUrl(fn (Product $replica): string => ProductResource::getUrl('edit', ['record' => $replica])),
+
                 EditAction::make(),
             ])
             ->toolbarActions([

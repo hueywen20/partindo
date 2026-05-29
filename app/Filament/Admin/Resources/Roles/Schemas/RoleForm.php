@@ -28,6 +28,9 @@ class RoleForm
         'Product Locations' => [
             'view_product_locations', 'create_product_locations', 'edit_product_locations', 'delete_product_locations',
         ],
+        'Categories' => [
+            'view_categories', 'create_categories', 'edit_categories', 'delete_categories',
+        ],
 
         // -- Inventory ─────────────────────────────────────────────────────────
         'Products' => [
