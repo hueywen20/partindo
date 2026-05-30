@@ -29,7 +29,10 @@ class RoleSeeder extends Seeder
             'product_locations' => [
                 'view_product_locations', 'create_product_locations', 'edit_product_locations', 'delete_product_locations'
             ],
-
+            'categories' => [
+                'view_categories', 'create_categories', 'edit_categories', 'delete_categories',
+            ],
+            
             // ── Inventory ─────────────────────────────────────────────────
             'products' => [
                 'view_product', 'create_product', 'edit_product', 'delete_product',
