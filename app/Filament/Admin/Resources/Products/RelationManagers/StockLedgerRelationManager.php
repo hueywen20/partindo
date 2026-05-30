@@ -73,7 +73,7 @@ class StockLedgerRelationManager extends RelationManager
                     ->getStateUsing(function (Model $record) {
                         if ($record->type === 'purchase') {
                             return \App\Models\Purchase::with('supplier')
-                                ->find($record->ref_id)?->supplier?->name ?? '-';
+                                ->find($record->ref_id)?->supplier?->company_name ?? '-';
                         } else {
                             return \App\Models\Sale::with('customer')
                                 ->find($record->ref_id)?->customer?->name ?? '-';
@@ -93,14 +93,20 @@ class StockLedgerRelationManager extends RelationManager
                         ? $record->qty
                         : '-'
                     ),
-
+                
                 TextColumn::make('purchase_price')
                     ->label('Purchase Price')
                     ->getStateUsing(function (Model $record) {
                         if ($record->type === 'purchase') {
-                            return $record->price
-                                ? 'Rp ' . number_format($record->price, 0, ',', '.')
-                                : '-';
+                            if (!$record->price) {
+                                return '-';
+                            }
+
+                            // cost = Price per pcs × (1 + Tax Rate)
+                            $tax = \App\Models\Purchase::with('supplier')->find($record->ref_id)?->tax ?? '-' ;
+                            $priceWithTax = $record->price * (1 + $tax / 100);
+
+                            return 'Rp ' . number_format($priceWithTax, 0, ',', '.');
                         }
                         return '-';
                     }),

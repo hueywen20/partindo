@@ -89,7 +89,7 @@ class PurchaseForm
                 ->label('Supplier')
                 ->options(
                     \App\Models\Supplier::where('status', 1)
-                        ->pluck('supplier_name', 'id')
+                        ->pluck('company_name', 'id')
                 )
                 ->searchable()
                 ->required(),
