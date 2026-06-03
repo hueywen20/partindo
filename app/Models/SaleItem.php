@@ -13,6 +13,7 @@ class SaleItem extends Model
         'price',
         'cost_price',  // add this
         'total',
+        'notes',
     ];
 
     public function sale()
@@ -24,4 +25,10 @@ class SaleItem extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function components()
+    {
+        return $this->hasMany(SaleItemComponent::class);
+    }
+
 }

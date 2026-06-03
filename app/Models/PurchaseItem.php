@@ -16,6 +16,7 @@ class PurchaseItem extends Model
         'price',
         'grand_total',
         'final_total',
+        'notes',
     ];
 
     protected static function booted(): void

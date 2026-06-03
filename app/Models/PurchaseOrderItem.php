@@ -15,6 +15,7 @@ class PurchaseOrderItem extends Model
         'qty',
         'price',
         'total',
+        'notes',
     ];
 
     // ─── Relationships ────────────────────────────────────────────────────────

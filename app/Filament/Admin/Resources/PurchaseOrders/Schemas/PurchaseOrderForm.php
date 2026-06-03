@@ -11,6 +11,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\Textarea;
 
 class PurchaseOrderForm
 {
@@ -128,6 +129,11 @@ class PurchaseOrderForm
                         ->prefix('Rp  ')
                         ->disabled()
                         ->dehydrated(true),
+                    
+                    Textarea::make('notes')
+                        ->label('Notes')
+                        ->placeholder('Remarks for this item...')
+                        ->rows(2),
                 ])
                 ->columns(5)
                 ->columnSpanFull()

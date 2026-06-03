@@ -29,6 +29,7 @@ class Product extends Model implements Auditable
         'min_stock_threshold',
         'created_by',
         'updated_by',
+        'is_composite',
 
         // add all fields you allow
     ];
@@ -118,5 +119,26 @@ class Product extends Model implements Auditable
     // {
     //     return $this->hasMany(ProductCode::class);
     // }
+
+    // Add relationships:
+    public function recipeSlots()
+    {
+        return $this->hasMany(ProductRecipeSlot::class, 'composite_product_id');
+    }
+
+    // Computed: how many of this composite can be built right now
+    public function getAvailableBuildsAttribute(): int
+    {
+        if (! $this->is_composite) return $this->stock ?? 0;
+
+        return $this->recipeSlots
+            ->map(function ($slot) {
+                $default = $slot->defaultSubstitute?->product;
+                if (! $default || $slot->quantity <= 0) return 0;
+                return (int) floor($default->stock / $slot->quantity);
+            })
+            ->min() ?? 0;
+    }
+
 
 }

@@ -10,6 +10,8 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextArea;
+
 
 class QuotationForm
 {
@@ -110,6 +112,12 @@ class QuotationForm
                         ->currency()
                         ->disabled()
                         ->dehydrated(true),
+                    
+                    TextArea::make('notes')
+                        ->label('Notes')
+                        ->placeholder('Remarks for this item...')
+                        ->rows(2)
+                        ->columnSpanFull(),
                 ])
                 ->columns(4)
                 ->columnSpanFull()

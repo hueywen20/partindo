@@ -84,6 +84,25 @@ class ProductsTable
 
                         return null;
                     }),
+                
+                TextColumn::make('is_composite')
+                    ->label('Type')
+                    ->formatStateUsing(fn ($state) => $state ? 'Composite' : 'Standard')
+                    ->badge()
+                    ->color(fn ($state) => $state ? 'primary' : 'gray'),
+
+                TextColumn::make('available_builds')
+                    ->label('Can build')
+                    ->getStateUsing(fn (Product $record) => $record->is_composite
+                        ? $record->available_builds
+                        : null
+                    )
+                    ->placeholder('—')
+                    ->description(fn (Product $record) => $record->is_composite
+                        ? 'based on default components'
+                        : null
+                    ),
+
 
                 TextColumn::make('uomModel.name')
                     ->label('UOM')

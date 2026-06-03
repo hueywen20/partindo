@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\Purchases\Schemas;
 
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -239,6 +240,11 @@ class PurchaseForm
                         ->columnSpan(1)
                         ->disabled()
                         ->dehydrated(true),
+
+                    Textarea::make('notes')
+                        ->label('Notes')
+                        ->placeholder('Remarks for this item...')
+                        ->rows(2),
                 ])
                 ->columns(9)
                 ->columnSpanFull()
