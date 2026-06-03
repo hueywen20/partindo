@@ -27,6 +27,7 @@ class PurchaseItemObserver
 
         $this->recalculateAvgCost($purchaseItem->product, $qty, $price);
         $purchaseItem->product->increment('stock', $qty);
+        $purchaseItem->purchase->recalculateTotals();
     }
 
     /**
@@ -56,6 +57,8 @@ class PurchaseItemObserver
             'avg_cost' => round($newAvg, 2),
             'stock'    => max(0, $newStock),
         ]);
+
+        $purchaseItem->purchase->recalculateTotals();
     }
 
     /**
@@ -83,6 +86,9 @@ class PurchaseItemObserver
             'avg_cost' => round(max(0, $newAvg), 2),
             'stock'    => max(0, $newStock),
         ]);
+
+        $purchaseItem->purchase->recalculateTotals();
+
     }
 
     /**

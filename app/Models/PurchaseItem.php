@@ -15,6 +15,7 @@ class PurchaseItem extends Model
         'qty',
         'price',
         'grand_total',
+        'final_total',
     ];
 
     protected static function booted(): void
@@ -26,6 +27,12 @@ class PurchaseItem extends Model
                 [, $codeLine] = explode('::', $item->part_no, 2);
                 $item->part_no = $codeLine;
             }
+
+
+            $total = (float) ($item->qty ?? 0) * (float) ($item->price ?? 0);
+
+            $item->grand_total = round($total, 2);
+            $item->final_total = round($total, 2);
         });
     }
 

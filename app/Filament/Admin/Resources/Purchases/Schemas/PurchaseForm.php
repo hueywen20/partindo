@@ -21,6 +21,11 @@ class PurchaseForm
         return (float) $cleaned;
     }
 
+    public static function formatCurrency(mixed $value): string
+    {
+        return number_format((float) $value, 2, ',', '.');
+    }
+
     public static function recalculate(callable $set, callable $get): void
     {
         $items = $get('items') ?? [];
@@ -31,7 +36,7 @@ class PurchaseForm
 
             $total = $qty * $price;
 
-            $set("items.$index.grand_total", number_format($total, 2, ',', '.'));
+            $set("items.$index.grand_total", self::formatCurrency($total));
 
             return $total;
         });
@@ -43,8 +48,8 @@ class PurchaseForm
 
         $final = max(0, $subtotal + $tax - $discount);
 
-        $set('grand_total', number_format($subtotal, 2, ',', '.'));
-        $set('final_total', number_format($final, 2, ',', '.'));
+        $set('grand_total', self::formatCurrency($subtotal));
+        $set('final_total', self::formatCurrency($final));
     }
 
     /**
@@ -214,7 +219,7 @@ class PurchaseForm
                         ->numeric()
                         ->minValue(1)
                         ->default(1)
-                        ->live()
+                        ->live(debounce: 300)
                         ->columnSpan(1)
                         ->afterStateUpdated(fn ($state, $set, $get) =>
                             self::recalculate($set, $get)
@@ -222,7 +227,7 @@ class PurchaseForm
 
                     TextInput::make('price')
                         ->currency()
-                        ->live()
+                        ->live(debounce: 300)
                         ->columnSpan(1)
                         ->afterStateUpdated(fn ($state, $set, $get) =>
                             self::recalculate($set, $get)
@@ -232,12 +237,16 @@ class PurchaseForm
                         ->label('Total')
                         ->currency()
                         ->columnSpan(1)
-                        ->disabled(),
+                        ->disabled()
+                        ->dehydrated(true),
                 ])
                 ->columns(9)
                 ->columnSpanFull()
                 ->addActionLabel('Add Product')
                 ->afterStateUpdated(fn ($state, $set, $get) =>
+                    self::recalculate($set, $get)
+                )
+                ->afterStateHydrated(fn ($state, $set, $get) =>
                     self::recalculate($set, $get)
                 ),
 
@@ -248,13 +257,14 @@ class PurchaseForm
             TextInput::make('grand_total')
                 ->currency()
                 ->columnStart(2)
-                ->disabled(),
+                ->disabled()
+                ->dehydrated(true),
 
             TextInput::make('tax')
                 ->label('Tax (%)')
                 ->numeric()
                 ->default(0)
-                ->live()
+                ->live(debounce: 300)
                 ->columnStart(2)
                 ->afterStateUpdated(fn ($state, $set, $get) =>
                     self::recalculate($set, $get)
@@ -263,7 +273,7 @@ class PurchaseForm
             TextInput::make('discount')
                 ->numeric()
                 ->default(0)
-                ->live()
+                ->live(debounce: 300)
                 ->columnStart(2)
                 ->afterStateUpdated(fn ($state, $set, $get) =>
                     self::recalculate($set, $get)
@@ -272,7 +282,8 @@ class PurchaseForm
             TextInput::make('final_total')
                 ->currency()
                 ->columnStart(2)
-                ->disabled(),
+                ->disabled()
+                ->dehydrated(true),
         ]);
     }
 }

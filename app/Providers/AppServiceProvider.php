@@ -70,14 +70,28 @@ class AppServiceProvider extends ServiceProvider
 
         TextInput::macro('currency', function () {
             /** @var TextInput $this */
+            $parseCurrency = function ($state): float {
+                if (! filled($state)) {
+                    return 0.0;
+                }
+
+                $state = (string) $state;
+
+                if (str_contains($state, ',')) {
+                    return (float) str_replace(['.', ','], ['', '.'], $state);
+                }
+
+                return (float) $state;
+            };
+
             return $this
                 ->prefix('Rp')
                 ->extraInputAttributes(['inputmode' => 'numeric'])
                 ->extraAlpineAttributes([
                     'x-mask:dynamic' => '$money($input, \',\', \'.\', 2)',
                 ])
-                ->formatStateUsing(fn ($state) => $state ? number_format((float) $state, 2, ',', '.') : '')
-                ->dehydrateStateUsing(fn ($state) => $state ? (float) str_replace(['.', ','], ['', '.'], $state) : null);
+                ->formatStateUsing(fn ($state) => filled($state) ? number_format($parseCurrency($state), 2, ',', '.') : '')
+                ->dehydrateStateUsing(fn ($state) => $parseCurrency($state));
         });
         
     }

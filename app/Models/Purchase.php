@@ -36,30 +36,30 @@ class Purchase extends Model implements Auditable
     protected static function booted()
     {
         static::saved(function ($purchase) {
-            // make sure items are loaded
-            $purchase->load('items');
-
-            $subtotal = $purchase->items->sum(function ($item) {
-                return $item->qty * $item->price;
-            });
-
-            $taxRate = $purchase->tax ?? 0;
-            $tax = $subtotal * ($taxRate / 100);
-
-            $discount = $purchase->discount ?? 0;
-
-            $final = max(0, $subtotal + $tax - $discount);
-
-            $purchase->updateQuietly([
-                'grand_total' => $subtotal,
-                'final_total' => $final,
-            ]);
+            $purchase->recalculateTotals();
         });
 
         static::deleting(function ($purchase) {
             $purchase->items->each(fn ($item) => $item->delete());
         });
     }
+
+    public function recalculateTotals(): void
+    {
+        $this->load('items');
+
+        $subtotal = $this->items->sum(function ($item) {
+            return (float) $item->qty * (float) $item->price;
+        });
+
+        $tax = $subtotal * ((float) ($this->tax ?? 0) / 100);
+        $discount = (float) ($this->discount ?? 0);
+        $final = max(0, $subtotal + $tax - $discount);
+
+        $this->updateQuietly([
+            'grand_total' => round($subtotal, 2),
+            'final_total' => round($final, 2),
+        ]);
+    }
     
 }
-
