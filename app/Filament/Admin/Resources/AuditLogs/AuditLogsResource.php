@@ -42,7 +42,7 @@ class AuditLogsResource extends Resource
                     ->rowIndex(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Date & Time')
-                    ->dateTime('d M Y, H:i:s')
+                    ->dateTime('d-m-Y, H:i:s')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('user.name')

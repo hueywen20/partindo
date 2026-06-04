@@ -19,7 +19,7 @@ class SalesTable
                 TextColumn::make('No.')
                     ->rowIndex(),
                 TextColumn::make('date')
-                    ->date()
+                    ->date('d-m-Y')
                     ->sortable(),
                 TextColumn::make('sale_inv_no')
                     ->searchable()

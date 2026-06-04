@@ -18,7 +18,7 @@ class PurchasesTable
                 TextColumn::make('No.')
                     ->rowIndex(),
                 TextColumn::make('date')
-                    ->date()
+                    ->date('d-m-Y')
                     ->sortable(),
                 TextColumn::make('purchase_inv_no')
                     ->label('Purchase Invoice No.')

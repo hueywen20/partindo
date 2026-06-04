@@ -27,7 +27,7 @@ class PurchaseOrdersTable
                     ->sortable(),
 
                 TextColumn::make('date')
-                    ->date()
+                    ->date('d-m-Y')
                     ->sortable(),
 
                 TextColumn::make('customer.customer_name')
@@ -53,7 +53,7 @@ class PurchaseOrdersTable
 
                 TextColumn::make('converted_to_sale_id')
                     ->label('Invoice')
-                    ->formatStateUsing(fn ($state) => $state ? '✓ Invoiced' : '—')
+                    ->formatStateUsing(fn ($state) => $state ? '✓ Invoice Issued' : '—')
                     ->color(fn ($state) => $state ? 'success' : 'gray'),
 
                 TextColumn::make('quotation.quotation_no')
