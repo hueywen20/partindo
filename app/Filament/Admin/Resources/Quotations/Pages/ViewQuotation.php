@@ -6,6 +6,7 @@ use App\Filament\Admin\Resources\Quotations\QuotationResource;
 use Filament\Actions\EditAction;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\ViewRecord;
+use App\Models\Quotation;
 
 class ViewQuotation extends ViewRecord
 {
@@ -19,7 +20,14 @@ class ViewQuotation extends ViewRecord
                 ->url($this->getResource()::getUrl('index'))
                 ->color('gray')
                 ->icon('heroicon-o-arrow-left'),
-            EditAction::make(),
+            EditAction::make()
+                ->hidden(fn (Quotation $record) => in_array($record->status, ['accepted', 'expired'])),
+            Action::make('print')
+                ->label('Print')
+                ->color('success')
+                ->icon('heroicon-o-printer')
+                ->url(fn (Quotation $record) => route('quotations.print', $record))
+                ->openUrlInNewTab(), // Opens print view in a fresh tab
         ];
     }
 }

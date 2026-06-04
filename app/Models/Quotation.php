@@ -105,4 +105,12 @@ class Quotation extends Model implements Auditable
 
         return $sale;
     }
+
+    protected function casts(): array
+    {
+        return [
+            'date' => 'date',
+            'valid_until' => 'date',
+        ];
+    }
 }

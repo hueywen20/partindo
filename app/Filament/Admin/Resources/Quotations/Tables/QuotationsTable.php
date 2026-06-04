@@ -26,12 +26,12 @@ class QuotationsTable
                     ->sortable(),
 
                 TextColumn::make('date')
-                    ->date()
+                    ->date('d-m-Y')
                     ->sortable(),
 
                 TextColumn::make('valid_until')
                     ->label('Valid Until')
-                    ->date()
+                    ->date('d-m-Y')
                     ->sortable(),
 
                 TextColumn::make('customer.customer_name')
@@ -110,7 +110,8 @@ class QuotationsTable
                             ->send();
                     }),
 
-                EditAction::make(),
+                EditAction::make()
+                    ->hidden(fn (Quotation $record) => in_array($record->status, ['accepted', 'expired'])),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

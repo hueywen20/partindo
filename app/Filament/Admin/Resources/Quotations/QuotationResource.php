@@ -14,6 +14,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use UnitEnum;
+use Illuminate\Database\Eloquent\Model;
 
 class QuotationResource extends Resource
 {
@@ -41,6 +42,21 @@ class QuotationResource extends Resource
     public static function table(Table $table): Table
     {
         return QuotationsTable::configure($table);
+    }
+
+    // 1. HARD LOCK THE EDIT ROUTE
+    public static function canEdit(Model $record): bool
+    {
+        // Block direct URL access if the status is accepted or expired
+        // This still allows 'draft' and 'sent' to be edited
+        return ! in_array($record->status, ['accepted', 'expired']);
+    }
+
+    // 2. HARD LOCK THE DELETE ROUTE
+    public static function canDelete(Model $record): bool
+    {
+        // Block direct URL or backend deletion unless it's a draft
+        return $record->status === 'draft';
     }
 
     public static function getRelations(): array
