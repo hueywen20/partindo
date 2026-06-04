@@ -33,27 +33,27 @@ class SalesTable
                     ->prefix('Rp ')
                     ->currency()
                     ->sortable(),
-                TextColumn::make('gross_profit')
-                    ->label('Gross Profit')
-                    ->getStateUsing(function (Sale $record): float {
-                        return $record->items->sum(
-                            fn($item) => ((float)$item->price - (float)$item->cost_price) * (float)$item->qty
-                        );
-                    })
-                    ->prefix('Rp ')
-                    ->currency()
-                    ->color(fn (Sale $record) =>
-                        $record->items->sum(fn($i) => ((float)$i->price - (float)$i->cost_price) * (float)$i->qty) >= 0
-                            ? 'success' : 'danger'
-                    ),
-                TextColumn::make('margin_pct')
-                    ->label('Margin %')
-                    ->getStateUsing(function (Sale $record): string {
-                        $revenue = (float) $record->final_total;
-                        $cogs    = $record->items->sum(fn($i) => (float)$i->cost_price * (float)$i->qty);
-                        if ($revenue <= 0) return '—';
-                        return number_format((($revenue - $cogs) / $revenue) * 100, 1) . '%';
-                    }),
+                // TextColumn::make('gross_profit')
+                //     ->label('Gross Profit')
+                //     ->getStateUsing(function (Sale $record): float {
+                //         return $record->items->sum(
+                //             fn($item) => ((float)$item->price - (float)$item->cost_price) * (float)$item->qty
+                //         );
+                //     })
+                //     ->prefix('Rp ')
+                //     ->currency()
+                //     ->color(fn (Sale $record) =>
+                //         $record->items->sum(fn($i) => ((float)$i->price - (float)$i->cost_price) * (float)$i->qty) >= 0
+                //             ? 'success' : 'danger'
+                //     ),
+                // TextColumn::make('margin_pct')
+                //     ->label('Margin %')
+                //     ->getStateUsing(function (Sale $record): string {
+                //         $revenue = (float) $record->final_total;
+                //         $cogs    = $record->items->sum(fn($i) => (float)$i->cost_price * (float)$i->qty);
+                //         if ($revenue <= 0) return '—';
+                //         return number_format((($revenue - $cogs) / $revenue) * 100, 1) . '%';
+                //     }),
                 // TextColumn::make('profit')
                 //     ->label('Gross Profit')
                 //     ->getStateUsing(function ($record) {
@@ -84,6 +84,7 @@ class SalesTable
             ->filters([
                 //
             ])
+            ->defaultSort('invoice_no', 'desc')
             ->recordUrl(fn ($record) => SaleResource::getUrl('view', ['record' => $record]))
             ->recordActions([
                 EditAction::make(),

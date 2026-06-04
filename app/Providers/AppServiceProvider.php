@@ -10,7 +10,9 @@ use App\Observers\SaleItemObserver;
 use Illuminate\Support\Facades\Gate;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
- 
+use Illuminate\Support\Facades\Event; 
+use Illuminate\Auth\Events\Login;
+use App\Listeners\UpdateUserSessionToken;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,6 +29,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Event::listen(\Illuminate\Auth\Events\Login::class, \App\Listeners\UpdateUserSessionToken::class);
+
         // register model observers to handle stock adjustments
         PurchaseItem::observe(PurchaseItemObserver::class);
         SaleItem::observe(SaleItemObserver::class);
@@ -60,12 +64,39 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // TextInput::macro('currency', function () {
-        //     /** @var TextInput $this */
+        //     /** @var \Filament\Forms\Components\TextInput $this */
+        //     $parse = function ($state): float {
+        //         if (! filled($state)) {
+        //             return 0.0;
+        //         }
+
+        //         $state = (string) $state;
+
+        //         // Convert: 1.000.000,00 → 1000000.00
+        //         $state = str_replace('.', '', $state);
+        //         $state = str_replace(',', '.', $state);
+
+        //         return (float) $state;
+        //     };
+
         //     return $this
         //         ->prefix('Rp')
-        //         ->extraInputAttributes(['inputmode' => 'numeric'])
-        //         ->formatStateUsing(fn ($state) => $state ? number_format((float) $state, 2, ',', '.') : '')
-        //         ->dehydrateStateUsing(fn ($state) => $state ? (float) str_replace(['.', ','], ['', '.'], $state) : null);
+        //         ->numeric()
+
+        //         // ✅ Filament v5 correct masking system
+        //         ->mask(\Filament\Support\RawJs::make('$money($input, \',\', \'.\', 2)'))
+
+        //         // ✅ display formatting
+        //         ->formatStateUsing(function ($state) use ($parse) {
+        //             if (! filled($state)) {
+        //                 return '';
+        //             }
+
+        //             return number_format($parse($state), 2, ',', '.');
+        //         })
+
+        //         // ✅ store clean float
+        //         ->dehydrateStateUsing(fn ($state) => $parse($state));
         // });
 
         TextInput::macro('currency', function () {

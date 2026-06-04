@@ -13,8 +13,8 @@ use Spatie\Permission\Traits\HasRoles;
 use OwenIt\Auditing\Contracts\Auditable;
 use OwenIt\Auditing\Auditable as AuditableTrait;
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
+#[Fillable(['name', 'email', 'password', 'user_id'])]
+#[Hidden(['password', 'remember_token', 'session_token'])]
 class User extends Authenticatable implements Auditable
 {
     use AuditableTrait;

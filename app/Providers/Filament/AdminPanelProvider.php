@@ -21,6 +21,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Wezlo\FilamentWorkspaceTabs\WorkspaceTabsPlugin;
+use App\Http\Middleware\EnsureSingleSession; 
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -58,6 +59,7 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                EnsureSingleSession::class, 
             ])
             ->plugins([
                 FilamentShieldPlugin::make(),
