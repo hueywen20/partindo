@@ -49,7 +49,7 @@
     </tr>
     <tr>
         <td>UNIT</td>
-        <td>: —</td>
+        <td>: {{ $quotation->excavator_model ?: '—' }}</td>
     </tr>
 </table>
 
@@ -82,7 +82,7 @@
             <tr>
                 <td class="text-center">{{ $index + 1 }}</td>
                 <td class="text-center">{{ $qty }}</td>
-                <td>PCS</td> 
+                <td>{{ $item->product?->uomModel?->name }}</td> 
                 <td>{{ $cleanPartNo }}</td>
                 <td>{{ $item->brand ?? '—' }}</td>
                 <td>{{ $description }}</td>

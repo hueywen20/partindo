@@ -18,6 +18,7 @@ class Quotation extends Model implements Auditable
         'status', 'tax', 'discount', 'grand_total', 'final_total',
         'converted_to_sale_id',
         'converted_to_po_id',
+        'excavator_model',
     ];
 
     // ─── Relationships ────────────────────────────────────────────────────────

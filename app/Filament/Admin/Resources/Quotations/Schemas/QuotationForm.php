@@ -17,6 +17,26 @@ use App\Services\QuotationNumberService;
 
 class QuotationForm
 {
+    /**
+     * Returns ['label' => ..., 'color' => 'success'|'warning'|'danger'] for the stock badge.
+     */
+    public static function stockStatus(Product $product): array
+    {
+        if ($product->is_composite) {
+            $builds = $product->available_builds;
+            if ($builds <= 0)  return ['label' => 'No Stock (0 builds)',        'color' => 'danger'];
+            if ($product->track_low_stock && $builds <= ($product->min_stock_threshold ?? 0))
+                               return ['label' => "Low Stock ({$builds} builds)", 'color' => 'warning'];
+            return             ['label' => "In Stock ({$builds} builds)",        'color' => 'success'];
+        }
+
+        $stock = $product->stock ?? 0;
+        if ($stock <= 0)       return ['label' => 'No Stock',          'color' => 'danger'];
+        if ($product->track_low_stock && $stock <= ($product->min_stock_threshold ?? 0))
+                               return ['label' => "Low Stock ({$stock})", 'color' => 'warning'];
+        return                 ['label' => "In Stock ({$stock})",      'color' => 'success'];
+    }
+
     public static function parseNumber(mixed $value): float
     {
         if (is_null($value) || $value === '') return 0.0;
@@ -120,6 +140,10 @@ class QuotationForm
                 ->default(now())
                 ->required(),
 
+            TextInput::make('excavator_model')
+                ->label('Excavator Model / Type')
+                ->placeholder('e.g. ZX 100-5 / PC 200-8 / etc'),
+
             Select::make('status')
                 ->options([
                     'draft'    => 'Draft',
@@ -140,6 +164,10 @@ class QuotationForm
                     // Tracks whether the selected product is composite
                     // so the components Repeater knows when to show
                     Hidden::make('is_composite_item')->default(false),
+
+                    // Stock status state (display only, never deducted)
+                    Hidden::make('stock_label')->default(''),
+                    Hidden::make('stock_color')->default(''),
 
                     Select::make('part_no')
                         ->label('Part No')
@@ -171,6 +199,7 @@ class QuotationForm
                         })
                         ->searchable()
                         ->live()
+                        ->columnSpan(2)
                         ->dehydrated(true)
                         ->placeholder('Paste or search part number…')
                         ->afterStateUpdated(function ($state, $set, $get) {
@@ -184,6 +213,11 @@ class QuotationForm
                             $set('price',        self::formatCurrency($product->price ?? 0));
                             $set('brand',        $product->brandModel?->name ?? null);
 
+                            // Stock status (display only, never deducted)
+                            $s = self::stockStatus($product);
+                            $set('stock_label', $s['label']);
+                            $set('stock_color', $s['color']);
+
                             $qty = self::parseNumber($get('qty') ?? 1);
                             self::populateComponents($set, $product, $qty);
 
@@ -195,13 +229,16 @@ class QuotationForm
                                 [$productId] = explode('::', $state, 2);
                                 $product = Product::find($productId);
                                 if ($product) {
-                                    $set('product_name',     $product->name);
+                                    $set('product_name',      $product->name);
                                     $set('is_composite_item', $product->is_composite);
+                                    $s = self::stockStatus($product);
+                                    $set('stock_label', $s['label']);
+                                    $set('stock_color', $s['color']);
                                 }
                                 return;
                             }
                             $product = Product::whereNotNull('code')
-                                ->get(['id', 'name', 'code'])
+                                ->get(['id', 'name', 'code', 'stock', 'track_low_stock', 'min_stock_threshold', 'is_composite'])
                                 ->first(fn ($p) => collect(explode("\n", $p->code))
                                     ->map(fn ($l) => trim($l))
                                     ->contains($state)
@@ -210,6 +247,9 @@ class QuotationForm
                                 $set('part_no',           "{$product->id}::{$state}");
                                 $set('product_name',      $product->name);
                                 $set('is_composite_item', $product->is_composite);
+                                $s = self::stockStatus($product);
+                                $set('stock_label', $s['label']);
+                                $set('stock_color', $s['color']);
                             }
                         }),
 
@@ -217,7 +257,15 @@ class QuotationForm
                         ->label('Description')
                         ->columnSpan(2)
                         ->disabled()
-                        ->dehydrated(false),
+                        ->dehydrated(false)
+                        ->hint(fn ($get) => $get('stock_label') ?: '')
+                        ->hintColor(fn ($get) => $get('stock_color') ?: 'gray')
+                        ->hintIcon(fn ($get) => match($get('stock_color')) {
+                            'success' => 'heroicon-m-check-circle',
+                            'warning' => 'heroicon-m-exclamation-triangle',
+                            'danger'  => 'heroicon-m-x-circle',
+                            default   => null,
+                        }),
 
                     TextInput::make('brand')
                         ->label('Brand')
@@ -264,8 +312,8 @@ class QuotationForm
                     Textarea::make('notes')
                         ->label('Notes')
                         ->placeholder('Remarks for this item...')
-                        ->rows(2)
-                        ->columnSpanFull(),
+                        ->rows(1),
+                        // ->columnSpanFull(),
 
                     // ── Component slots — only visible for composite products ──
                     Repeater::make('components')
@@ -280,7 +328,19 @@ class QuotationForm
                                 ->label('Slot')
                                 ->disabled()
                                 ->dehydrated(false)
-                                ->columnSpan(2),
+                                ->columnSpan(2)
+                                ->afterStateHydrated(function ($state, $set, $get) {
+                                    // slot_name is not persisted; re-derive it from slot_id on load
+                                    if (! $state) {
+                                        $slotId = $get('slot_id');
+                                        if ($slotId) {
+                                            $slot = \App\Models\ProductRecipeSlot::find($slotId);
+                                            if ($slot) {
+                                                $set('slot_name', $slot->slot_name);
+                                            }
+                                        }
+                                    }
+                                }),
 
                             Hidden::make('slot_id'),
 

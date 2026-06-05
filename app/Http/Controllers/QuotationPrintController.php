@@ -13,7 +13,7 @@ class QuotationPrintController extends Controller
     public function print(Quotation $quotation)
     {
         // Eager load relationships to prevent N+1 performance bottlenecks
-        $quotation->load(['customer', 'items']); 
+        $quotation->load(['customer', 'items.product.uomModel']); 
 
         // Renders the blade layout located at resources/views/prints/quotation.blade.php
         return view('prints.quotation', compact('quotation'));
