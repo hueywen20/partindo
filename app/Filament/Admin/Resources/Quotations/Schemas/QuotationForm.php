@@ -125,7 +125,7 @@ class QuotationForm
 
             Select::make('customer_id')
                 ->label('Customer')
-               ->options(
+                ->options(
                     Customer::where('status', 1)
                         ->get()
                         ->mapWithKeys(fn ($c) => [
