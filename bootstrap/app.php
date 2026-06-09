@@ -11,6 +11,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->redirectGuestsTo(fn () => route('filament.admin.auth.login'));
+        
         $middleware->alias([
             'single-session' => \App\Http\Middleware\EnsureSingleSession::class,
         ]);

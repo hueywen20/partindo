@@ -22,12 +22,20 @@ class ViewQuotation extends ViewRecord
                 ->icon('heroicon-o-arrow-left'),
             EditAction::make()
                 ->hidden(fn (Quotation $record) => in_array($record->status, ['accepted', 'expired'])),
+            
             Action::make('print')
                 ->label('Print')
                 ->color('success')
                 ->icon('heroicon-o-printer')
                 ->url(fn (Quotation $record) => route('quotations.print', $record))
                 ->openUrlInNewTab(), // Opens print view in a fresh tab
+
+            Action::make('print-dot-matrix')
+                ->label('Print Dot Matrix')
+                ->color('success')
+                ->icon('heroicon-o-printer')
+                ->url(fn (Quotation $record) => route('quotations.print-dot-matrix', $record))
+                ->openUrlInNewTab(),
         ];
     }
 }
