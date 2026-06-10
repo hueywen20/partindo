@@ -9,9 +9,11 @@ class SaleItem extends Model
     protected $fillable = [
         'sale_id',
         'product_id',
+        'part_no',
+        'brand',
         'qty',
         'price',
-        'cost_price',  // add this
+        'cost_price',
         'total',
         'notes',
     ];
@@ -30,5 +32,4 @@ class SaleItem extends Model
     {
         return $this->hasMany(SaleItemComponent::class);
     }
-
 }

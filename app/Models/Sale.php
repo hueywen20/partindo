@@ -10,15 +10,20 @@ use OwenIt\Auditing\Auditable as AuditableTrait;
 class Sale extends Model implements Auditable
 {
     use AuditableTrait;
-    
-    protected $fillable = ['date',
-    'sale_inv_no',
-    'customer_id',
-    // 'reference_no',
-    'tax',
-    'discount',
-    'grand_total',
-    'final_total',];
+
+    protected $fillable = [
+        'date',
+        'sale_inv_no',
+        'customer_id',
+        'quotation_id',
+        'purchase_order_id',
+        'tax',
+        'discount',
+        'grand_total',
+        'final_total',
+    ];
+
+    // ─── Relationships ────────────────────────────────────────────────────────
 
     public function items()
     {
@@ -30,30 +35,22 @@ class Sale extends Model implements Auditable
         return $this->belongsTo(Customer::class);
     }
 
-    // protected static function booted()
-    // {
-    //     static::saved(function ($sale) {
+    public function quotation()
+    {
+        return $this->belongsTo(Quotation::class);
+    }
 
-    //         $sale->load('items');
+    public function purchaseOrder()
+    {
+        return $this->belongsTo(PurchaseOrder::class);
+    }
 
-    //         $subtotal = $sale->items->sum(fn ($item) => $item->qty * $item->price);
-
-    //         $taxRate = $sale->tax ?? 0;
-    //         $tax = $subtotal * ($taxRate / 100);
-    //         $discount = $sale->discount ?? 0;
-    //         $final = max(0, $subtotal + $tax - $discount);
-
-    //         $sale->updateQuietly([
-    //             'grand_total' => $subtotal,
-    //             'final_total' => $final,
-    //         ]);
-    //     });
-    // }
+    // ─── Recalculate totals ───────────────────────────────────────────────────
 
     public function recalculateTotals(): void
     {
         $this->loadMissing('items');
-        $subtotal = $this->items->sum(fn($item) => $item->qty * $item->price);
+        $subtotal = $this->items->sum(fn ($item) => $item->qty * $item->price);
         $tax      = $subtotal * (($this->tax ?? 0) / 100);
         $final    = max(0, $subtotal + $tax - ($this->discount ?? 0));
 
@@ -62,5 +59,4 @@ class Sale extends Model implements Auditable
             'final_total' => $final,
         ]);
     }
-
 }

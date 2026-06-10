@@ -66,9 +66,9 @@ class PurchaseOrder extends Model implements Auditable
     //     ]);
     // }
 
-    // /**
-    //  * Build the WhatsApp share URL for this PO.
-    //  */
+    /**
+     * Build the WhatsApp share URL for this PO.
+     */
     // public function whatsappUrl(): string
     // {
     //     $customerPhone = $this->customer?->phone ?? '';
@@ -86,13 +86,15 @@ class PurchaseOrder extends Model implements Auditable
     public function convertToSale(): Sale
     {
         $sale = Sale::create([
-            'sale_inv_no' => SaleInvoiceNumberService::generate(),
-            'date'        => now(),
-            'customer_id' => $this->customer_id,
-            'tax'         => $this->tax,
-            'discount'    => $this->discount,
-            'grand_total' => $this->grand_total,
-            'final_total' => $this->final_total,
+            'sale_inv_no'       => SaleInvoiceNumberService::generate(),
+            'date'              => now(),
+            'customer_id'       => $this->customer_id,
+            'purchase_order_id' => $this->id,
+            'quotation_id'      => $this->quotation_id,
+            'tax'               => $this->tax,
+            'discount'          => $this->discount,
+            'grand_total'       => $this->grand_total,
+            'final_total'       => $this->final_total,
         ]);
 
         foreach ($this->items()->with('components')->get() as $item) {
@@ -156,11 +158,11 @@ class PurchaseOrder extends Model implements Auditable
         });
     }
 
-    // protected function casts(): array
-    // {
-    //     return [
-    //         'date'                 => 'date',
-    //         'sent_via_whatsapp_at' => 'datetime',
-    //     ];
-    // }
+    protected function casts(): array
+    {
+        return [
+            'date'                 => 'date',
+            'sent_via_whatsapp_at' => 'datetime',
+        ];
+    }
 }

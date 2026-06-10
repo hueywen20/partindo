@@ -61,16 +61,16 @@ class Quotation extends Model implements Auditable
      * Check whether the valid_until date has passed and auto-expire if needed.
      * Call this from a scheduled command or on read.
      */
-    // public function checkAndExpire(): void
-    // {
-    //     if (
-    //         ! in_array($this->status, ['accepted', 'expired'])
-    //         && $this->valid_until
-    //         && $this->valid_until->isPast()
-    //     ) {
-    //         $this->update(['status' => 'expired']);
-    //     }
-    // }
+    public function checkAndExpire(): void
+    {
+        if (
+            ! in_array($this->status, ['accepted', 'expired'])
+            && $this->valid_until
+            && $this->valid_until->isPast()
+        ) {
+            $this->update(['status' => 'expired']);
+        }
+    }
 
     /**
      * Build the WhatsApp share URL for this quotation.
@@ -140,13 +140,14 @@ class Quotation extends Model implements Auditable
     public function convertToSale(): Sale
     {
         $sale = Sale::create([
-            'sale_inv_no' => SaleInvoiceNumberService::generate(),
-            'date'        => now(),
-            'customer_id' => $this->customer_id,
-            'tax'         => $this->tax,
-            'discount'    => $this->discount,
-            'grand_total' => $this->grand_total,
-            'final_total' => $this->final_total,
+            'sale_inv_no'  => SaleInvoiceNumberService::generate(),
+            'date'         => now(),
+            'customer_id'  => $this->customer_id,
+            'quotation_id' => $this->id,
+            'tax'          => $this->tax,
+            'discount'     => $this->discount,
+            'grand_total'  => $this->grand_total,
+            'final_total'  => $this->final_total,
         ]);
 
         foreach ($this->items()->with('components')->get() as $item) {
