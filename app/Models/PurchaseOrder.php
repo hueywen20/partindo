@@ -10,8 +10,8 @@ use OwenIt\Auditing\Auditable as AuditableTrait;
 
 class PurchaseOrder extends Model implements Auditable
 {
-    use AuditableTrait; 
-    
+    use AuditableTrait;
+
     protected $fillable = [
         'po_no',
         'date',
@@ -19,6 +19,7 @@ class PurchaseOrder extends Model implements Auditable
         'customer_id',
         'supplier_id',
         'status',
+        // 'sent_via_whatsapp_at',
         'tax',
         'discount',
         'grand_total',
@@ -53,6 +54,33 @@ class PurchaseOrder extends Model implements Auditable
         return $this->belongsTo(Sale::class, 'converted_to_sale_id');
     }
 
+    // ─── Status helpers ───────────────────────────────────────────────────────
+
+    /**
+     * Mark as sent via WhatsApp. Sets status → 'open' (if still draft) and stamps timestamp.
+     */
+    // public function markSentViaWhatsapp(): void
+    // {
+    //     $this->update([
+    //         'sent_via_whatsapp_at' => now(),
+    //     ]);
+    // }
+
+    // /**
+    //  * Build the WhatsApp share URL for this PO.
+    //  */
+    // public function whatsappUrl(): string
+    // {
+    //     $customerPhone = $this->customer?->phone ?? '';
+    //     $phone = preg_replace('/\D/', '', $customerPhone);
+
+    //     $message = "Halo, berikut adalah Purchase Order kami *{$this->po_no}*.\n"
+    //              . "Tanggal: {$this->date->format('d/m/Y')}\n\n"
+    //              . "Mohon konfirmasi penerimaan PO ini.";
+
+    //     return 'https://wa.me/' . $phone . '?text=' . rawurlencode($message);
+    // }
+
     // ─── Convert PO → Sales Invoice ──────────────────────────────────────────
 
     public function convertToSale(): Sale
@@ -67,13 +95,25 @@ class PurchaseOrder extends Model implements Auditable
             'final_total' => $this->final_total,
         ]);
 
-        foreach ($this->items as $item) {
-            $sale->items()->create([
+        foreach ($this->items()->with('components')->get() as $item) {
+            $saleItem = $sale->items()->create([
                 'product_id' => $item->product_id,
+                'part_no'    => $item->part_no,
+                'brand'      => $item->brand,
                 'qty'        => $item->qty,
                 'price'      => $item->price,
                 'total'      => $item->total,
+                'notes'      => $item->notes,
             ]);
+
+            // Carry component substitution choices from PO → sale
+            foreach ($item->components as $comp) {
+                $saleItem->components()->create([
+                    'slot_id'           => $comp->slot_id,
+                    'chosen_product_id' => $comp->chosen_product_id,
+                    'qty_used'          => $comp->qty_used,
+                ]);
+            }
         }
 
         $this->update([
@@ -115,4 +155,12 @@ class PurchaseOrder extends Model implements Auditable
             $po->items->each(fn ($item) => $item->delete());
         });
     }
+
+    // protected function casts(): array
+    // {
+    //     return [
+    //         'date'                 => 'date',
+    //         'sent_via_whatsapp_at' => 'datetime',
+    //     ];
+    // }
 }

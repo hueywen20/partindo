@@ -14,7 +14,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use UnitEnum;
-use App\Services\PurchaseOrderNumberService;
+use Illuminate\Database\Eloquent\Model;
 
 class PurchaseOrderResource extends Resource
 {
@@ -26,6 +26,16 @@ class PurchaseOrderResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    protected static ?string $recordTitleAttribute = 'po_no';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return [
+            'po_no',
+            'customer.customer_name',
+        ];
+    }
+
     public static function form(Schema $schema): Schema
     {
         return PurchaseOrderForm::configure($schema);
@@ -36,27 +46,30 @@ class PurchaseOrderResource extends Resource
         return PurchaseOrdersTable::configure($table);
     }
 
+    // Hard-lock edit for fulfilled / cancelled
+    public static function canEdit(Model $record): bool
+    {
+        return ! in_array($record->status, ['fulfilled', 'cancelled']);
+    }
+
+    // Only allow delete when open
+    public static function canDelete(Model $record): bool
+    {
+        return $record->status === 'open';
+    }
+
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => ListPurchaseOrders::route('/'),
+            'index'  => ListPurchaseOrders::route('/'),
             'create' => CreatePurchaseOrder::route('/create'),
-            'view' => Pages\ViewPurchaseOrder::route('/{record}'),
-            'edit' => EditPurchaseOrder::route('/{record}/edit'),
+            'view'   => Pages\ViewPurchaseOrder::route('/{record}'),
+            'edit'   => EditPurchaseOrder::route('/{record}/edit'),
         ];
-    }
-
-     public static function mutateFormDataBeforeCreate(array $data): array
-    {
-        $data['purchase_order_no'] = PurchaseOrderNumberService::generate();
-
-        return $data;
     }
 }
