@@ -134,6 +134,23 @@ class SaleForm
                 ->searchable()
                 ->required(),
 
+            Select::make('payment_type')
+                ->label('Payment Type')
+                ->options([
+                    'cash' => 'Cash',
+                    'credit' => 'Credit',
+                ])
+                ->default('cash')
+                ->live()
+                ->required(),
+
+            TextInput::make('payment_terms_days')
+                ->label('Payment Terms (days)')
+                ->numeric()
+                ->minValue(1)
+                ->default(30)
+                ->visible(fn ($get) => $get('payment_type') === 'credit')
+                ->required(fn ($get) => $get('payment_type') === 'credit'),
             // ── Line items ────────────────────────────────────────────────────
 
             Repeater::make('items')

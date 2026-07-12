@@ -21,6 +21,9 @@ class Sale extends Model implements Auditable
         'discount',
         'grand_total',
         'final_total',
+        'payment_type',
+        'payment_terms_days',
+        'payment_status',
     ];
 
     // ─── Relationships ────────────────────────────────────────────────────────
@@ -45,6 +48,67 @@ class Sale extends Model implements Auditable
         return $this->belongsTo(PurchaseOrder::class);
     }
 
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    // ─── Payment status ───────────────────────────────────────────────────────
+
+    public function isCredit(): bool
+    {
+        return $this->payment_type === 'credit';
+    }
+
+    public function getPaidAmountAttribute(): float
+    {
+        return (float) $this->payments()->sum('amount');
+    }
+
+    public function getBalanceAttribute(): float
+    {
+        return max(0, round((float) $this->final_total - $this->paid_amount, 2));
+    }
+
+    public function getDueDateAttribute(): ?\Illuminate\Support\Carbon
+    {
+        if (! $this->isCredit() || ! $this->payment_terms_days) {
+            return null;
+        }
+
+        return \Illuminate\Support\Carbon::parse($this->date)->addDays($this->payment_terms_days);
+    }
+
+    public function getIsOverdueAttribute(): bool
+    {
+        return $this->isCredit()
+            && $this->balance > 0
+            && $this->due_date !== null
+            && $this->due_date->isPast();
+    }
+
+    /**
+     * Recompute and persist payment_status based on current payments.
+     * Called whenever a Payment is saved/deleted, and after totals change.
+     */
+    public function refreshPaymentStatus(): void
+    {
+        if (! $this->isCredit()) {
+            $status = 'paid';
+        } else {
+            $paid = $this->paid_amount;
+            $status = match (true) {
+                $paid <= 0 => 'unpaid',
+                $paid < (float) $this->final_total => 'partial',
+                default => 'paid',
+            };
+        }
+
+        if ($status !== $this->payment_status) {
+            $this->updateQuietly(['payment_status' => $status]);
+        }
+    }
+
     // ─── Recalculate totals ───────────────────────────────────────────────────
 
     public function recalculateTotals(): void
@@ -58,5 +122,7 @@ class Sale extends Model implements Auditable
             'grand_total' => $subtotal,
             'final_total' => $final,
         ]);
+
+        $this->refreshPaymentStatus();
     }
-}
+};

@@ -10,6 +10,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class SalesTable
@@ -40,6 +41,29 @@ class SalesTable
                     ->prefix('Rp ')
                     ->currency()
                     ->sortable(),
+
+                TextColumn::make('payment_type')
+                    ->label('Type')
+                    ->badge()
+                    ->formatStateUsing(fn (string $state) => ucfirst($state))
+                    ->color(fn (string $state) => $state === 'credit' ? 'warning' : 'success'),
+
+                TextColumn::make('balance')
+                    ->label('Balance')
+                    ->prefix('Rp ')
+                    ->getStateUsing(fn (Sale $record) => number_format($record->balance, 2))
+                    ->color(fn (Sale $record) => $record->balance > 0 ? 'danger' : 'gray'),
+
+                TextColumn::make('payment_status')
+                    ->label('Status')
+                    ->badge()
+                    ->formatStateUsing(fn (string $state) => ucfirst($state))
+                    ->color(fn (string $state) => match ($state) {
+                        'paid' => 'success',
+                        'partial' => 'warning',
+                        'unpaid' => 'danger',
+                        default => 'gray',
+                    }),
 
                 // Clickable quotation number
                 TextColumn::make('quotation.quotation_no')
@@ -72,7 +96,18 @@ class SalesTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('payment_type')
+                    ->options([
+                        'cash' => 'Cash',
+                        'credit' => 'Credit',
+                    ]),
+                SelectFilter::make('payment_status')
+                    ->label('Status')
+                    ->options([
+                        'unpaid' => 'Unpaid',
+                        'partial' => 'Partial',
+                        'paid' => 'Paid',
+                    ]),
             ])
             ->defaultSort('created_at', 'desc')
             ->recordUrl(fn ($record) => SaleResource::getUrl('view', ['record' => $record]))

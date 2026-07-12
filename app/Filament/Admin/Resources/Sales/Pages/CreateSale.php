@@ -23,4 +23,9 @@ class CreateSale extends CreateRecord
     {
         return $this->getResource()::getUrl('index');
     }
+
+    protected function afterCreate(): void
+    {
+        $this->record->refreshPaymentStatus();
+    }
 }
