@@ -17,5 +17,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/quotations/{quotation}/print-dot-matrix', ['App\Http\Controllers\QuotationPrintController', 'printDotMatrix'])
         ->name('quotations.print-dot-matrix');
+    Route::get('/reports/debt/print', ['App\Http\Controllers\DebtReportPrintController', 'print'])
+        ->name('reports.debt.print');
 
 });
