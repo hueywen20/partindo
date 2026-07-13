@@ -2,7 +2,6 @@
 
 namespace App\Filament\Admin\Pages\Reports;
 
-use App\Filament\Admin\Pages\Reports\Concerns\ExportsCsv;
 use App\Models\Customer;
 use App\Models\Sale;
 use BackedEnum;
@@ -22,7 +21,6 @@ use UnitEnum;
 class SalesReport extends Page implements HasTable
 {
     use InteractsWithTable;
-    use ExportsCsv;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-presentation-chart-line';
 
@@ -126,31 +124,18 @@ class SalesReport extends Page implements HasTable
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('export')
-                ->label('Export CSV')
-                ->icon('heroicon-o-arrow-down-tray')
-                ->color('gray')
-                ->action(function () {
-                    $rows = $this->getFilteredTableQuery()
-                        ->with('customer')
-                        ->get()
-                        ->map(fn (Sale $sale) => [
-                            $sale->date,
-                            $sale->sale_inv_no,
-                            $sale->customer?->customer_name,
-                            $sale->grand_total,
-                            $sale->final_total,
-                            $sale->payment_type,
-                            $sale->balance,
-                            $sale->payment_status,
-                        ]);
-
-                    return $this->streamCsv(
-                        'sales-report-' . now()->format('Y-m-d') . '.csv',
-                        ['Date', 'Invoice No', 'Customer', 'Subtotal', 'Total', 'Type', 'Balance', 'Status'],
-                        $rows,
-                    );
-                }),
+            Action::make('print')
+                ->label('Print Report')
+                ->icon('heroicon-o-printer')
+                ->color('primary')
+                ->url(fn () => route('reports.sales.print', array_filter([
+                    'from' => $this->tableFilters['date_range']['from'] ?? null,
+                    'until' => $this->tableFilters['date_range']['until'] ?? null,
+                    'customer_id' => $this->tableFilters['customer_id']['value'] ?? null,
+                    'payment_type' => $this->tableFilters['payment_type']['value'] ?? null,
+                    'payment_status' => $this->tableFilters['payment_status']['value'] ?? null,
+                ])))
+                ->openUrlInNewTab(),
         ];
     }
 }

@@ -17,7 +17,20 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/quotations/{quotation}/print-dot-matrix', ['App\Http\Controllers\QuotationPrintController', 'printDotMatrix'])
         ->name('quotations.print-dot-matrix');
-    Route::get('/reports/debt/print', ['App\Http\Controllers\DebtReportPrintController', 'print'])
+    
+        Route::get('/reports/debt/print', ['App\Http\Controllers\DebtReportPrintController', 'print'])
         ->name('reports.debt.print');
+    
+        Route::get('/reports/statement/print', ['App\Http\Controllers\StatementOfAccountPrintController', 'print'])
+        ->name('reports.statement.print');
+
+    Route::get('/reports/sales/print', ['App\Http\Controllers\SalesReportPrintController', 'print'])
+        ->name('reports.sales.print');
+
+    Route::get('/reports/purchase/print', ['App\Http\Controllers\PurchaseReportPrintController', 'print'])
+        ->name('reports.purchase.print');
+
+    Route::get('/reports/customer/print', ['App\Http\Controllers\CustomerReportPrintController', 'print'])
+        ->name('reports.customer.print');
 
 });

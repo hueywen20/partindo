@@ -2,7 +2,6 @@
 
 namespace App\Filament\Admin\Pages\Reports;
 
-use App\Filament\Admin\Pages\Reports\Concerns\ExportsCsv;
 use App\Models\Purchase;
 use App\Models\Supplier;
 use BackedEnum;
@@ -22,7 +21,6 @@ use UnitEnum;
 class PurchaseReport extends Page implements HasTable
 {
     use InteractsWithTable;
-    use ExportsCsv;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-truck';
 
@@ -94,29 +92,16 @@ class PurchaseReport extends Page implements HasTable
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('export')
-                ->label('Export CSV')
-                ->icon('heroicon-o-arrow-down-tray')
-                ->color('gray')
-                ->action(function () {
-                    $rows = $this->getFilteredTableQuery()
-                        ->with('supplier')
-                        ->get()
-                        ->map(fn (Purchase $purchase) => [
-                            $purchase->date,
-                            $purchase->purchase_inv_no,
-                            $purchase->reference_no,
-                            $purchase->supplier?->supplier_name,
-                            $purchase->grand_total,
-                            $purchase->final_total,
-                        ]);
-
-                    return $this->streamCsv(
-                        'purchase-report-' . now()->format('Y-m-d') . '.csv',
-                        ['Date', 'Invoice No', 'Reference', 'Supplier', 'Subtotal', 'Total'],
-                        $rows,
-                    );
-                }),
+            Action::make('print')
+                ->label('Print Report')
+                ->icon('heroicon-o-printer')
+                ->color('primary')
+                ->url(fn () => route('reports.purchase.print', array_filter([
+                    'from' => $this->tableFilters['date_range']['from'] ?? null,
+                    'until' => $this->tableFilters['date_range']['until'] ?? null,
+                    'supplier_id' => $this->tableFilters['supplier_id']['value'] ?? null,
+                ])))
+                ->openUrlInNewTab(),
         ];
     }
 }

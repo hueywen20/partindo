@@ -2,7 +2,6 @@
 
 namespace App\Filament\Admin\Pages\Reports;
 
-use App\Filament\Admin\Pages\Reports\Concerns\ExportsCsv;
 use App\Models\Customer;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -18,7 +17,6 @@ use UnitEnum;
 class CustomerReport extends Page implements HasTable
 {
     use InteractsWithTable;
-    use ExportsCsv;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-user-group';
 
@@ -99,29 +97,14 @@ class CustomerReport extends Page implements HasTable
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('export')
-                ->label('Export CSV')
-                ->icon('heroicon-o-arrow-down-tray')
-                ->color('gray')
-                ->action(function () {
-                    $rows = $this->getFilteredTableQuery()
-                        ->get()
-                        ->map(fn (Customer $customer) => [
-                            $customer->customer_name,
-                            $customer->company_name,
-                            $customer->phone_no,
-                            $customer->invoice_count,
-                            $customer->total_sales_amount ?? 0,
-                            $customer->total_paid_amount ?? 0,
-                            max(0, ($customer->credit_sales_amount ?? 0) - ($customer->total_paid_amount ?? 0)),
-                        ]);
-
-                    return $this->streamCsv(
-                        'customer-report-' . now()->format('Y-m-d') . '.csv',
-                        ['Customer', 'Company', 'Phone', 'Invoices', 'Total Sales', 'Total Paid (Credit)', 'Outstanding'],
-                        $rows,
-                    );
-                }),
+            Action::make('print')
+                ->label('Print Report')
+                ->icon('heroicon-o-printer')
+                ->color('primary')
+                ->url(fn () => route('reports.customer.print', array_filter([
+                    'has_outstanding' => $this->tableFilters['has_outstanding']['isActive'] ?? null,
+                ])))
+                ->openUrlInNewTab(),
         ];
     }
 }
