@@ -6,12 +6,14 @@ use App\Filament\Admin\Resources\PurchaseOrders\PurchaseOrderResource;
 use App\Filament\Admin\Resources\Quotations\QuotationResource;
 use App\Filament\Admin\Resources\Sales\SaleResource;
 use App\Models\Sale;
+use App\Models\User;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class SalesTable
 {
@@ -41,6 +43,21 @@ class SalesTable
                     ->prefix('Rp ')
                     ->currency()
                     ->sortable(),
+
+                TextColumn::make('cost')
+                    ->label('Cost')
+                    ->prefix('Rp ')
+                    ->getStateUsing(fn (Sale $record) => number_format($record->cost, 2))
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->visible(fn () => Auth::user()?->canViewProfit() ?? false),
+
+                TextColumn::make('profit')
+                    ->label('Profit')
+                    ->prefix('Rp ')
+                    ->getStateUsing(fn (Sale $record) => number_format($record->profit, 2))
+                    ->color(fn (Sale $record) => $record->profit >= 0 ? 'success' : 'danger')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->visible(fn () => Auth::user()?->canViewProfit() ?? false),
 
                 TextColumn::make('payment_type')
                     ->label('Type')

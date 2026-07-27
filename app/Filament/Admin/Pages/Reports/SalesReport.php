@@ -16,6 +16,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use UnitEnum;
 
 class SalesReport extends Page implements HasTable
@@ -63,6 +64,21 @@ class SalesReport extends Page implements HasTable
                     ->currency()
                     ->sortable()
                     ->summarize(Sum::make()->label('Total')),
+
+                TextColumn::make('cost')
+                    ->label('Cost')
+                    ->prefix('Rp ')
+                    ->getStateUsing(fn (Sale $record) => number_format($record->cost, 2))
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->visible(fn () => Auth::user()?->canViewProfit() ?? false),
+
+                TextColumn::make('profit')
+                    ->label('Profit')
+                    ->prefix('Rp ')
+                    ->getStateUsing(fn (Sale $record) => number_format($record->profit, 2))
+                    ->color(fn (Sale $record) => $record->profit >= 0 ? 'success' : 'danger')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->visible(fn () => Auth::user()?->canViewProfit() ?? false),
 
                 TextColumn::make('payment_type')
                     ->label('Type')

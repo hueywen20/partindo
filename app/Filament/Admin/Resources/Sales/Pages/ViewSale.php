@@ -22,4 +22,11 @@ class ViewSale extends ViewRecord
             EditAction::make(),
         ];
     }
+
+    protected function getFooterWidgets(): array
+    {
+        return [
+            \App\Filament\Admin\Resources\Sales\Widgets\SaleProfitOverview::class,
+        ];
+    }
 }

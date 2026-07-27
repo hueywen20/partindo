@@ -109,6 +109,18 @@ class Sale extends Model implements Auditable
         }
     }
 
+    public function getCostAttribute(): float
+    {
+        return (float) $this->items()
+            ->selectRaw('COALESCE(SUM(qty * cost_price), 0) as total')
+            ->value('total');
+    }
+
+    public function getProfitAttribute(): float
+    {
+        return round((float) $this->final_total - $this->cost, 2);
+    }
+
     // ─── Recalculate totals ───────────────────────────────────────────────────
 
     public function recalculateTotals(): void
