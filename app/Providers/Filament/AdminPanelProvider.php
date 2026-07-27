@@ -22,6 +22,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Wezlo\FilamentWorkspaceTabs\WorkspaceTabsPlugin;
 use App\Http\Middleware\EnsureSingleSession; 
+use Filament\Navigation\NavigationGroup;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -38,6 +39,15 @@ class AdminPanelProvider extends PanelProvider
             ])
             // ->sidebarCollapsibleOnDesktop()
             ->topNavigation()
+            ->navigationGroups([
+                NavigationGroup::make()->label('Dashboard'),
+                NavigationGroup::make()->label('Master'),
+                NavigationGroup::make()->label('Inventory'),
+                NavigationGroup::make()->label('Purchasing'),
+                NavigationGroup::make()->label('Sales'),
+                NavigationGroup::make()->label('Reports'),
+                NavigationGroup::make()->label('Settings'),
+            ])
             ->maxContentWidth(Width::Full)
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\Filament\Admin\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\Filament\Admin\Pages')
