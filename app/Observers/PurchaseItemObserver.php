@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Models\Product;
 use App\Models\PurchaseItem;
 
 class PurchaseItemObserver
@@ -108,7 +109,7 @@ class PurchaseItemObserver
         return round($price * (1 + ($taxRate / 100)), 2);
     }
 
-    private function recalculateAvgCost($product, float $incomingQty, float $incomingPrice): void
+    private function recalculateAvgCost(Product $product, float $incomingQty, float $incomingPrice): void
     {
         $currentStock = (float) $product->stock;
         $currentAvg   = (float) $product->avg_cost;
