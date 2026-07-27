@@ -20,7 +20,7 @@ class QuotationResource extends Resource
 {
     protected static ?string $model = Quotation::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocument;
 
     protected static string|UnitEnum|null $navigationGroup = 'Sales';
 

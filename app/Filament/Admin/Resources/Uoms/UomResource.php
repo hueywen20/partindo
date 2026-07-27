@@ -19,7 +19,7 @@ class UomResource extends Resource
 {
     protected static ?string $model = Uom::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedAtSymbol;
 
     protected static string|UnitEnum|null $navigationGroup = 'Master';
 
