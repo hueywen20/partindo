@@ -6,9 +6,15 @@ RUN apt-get update && apt-get install -y \
     git \
     unzip \
     libpq-dev \
+    libzip-dev \
+    libicu-dev \
     nodejs \
     npm \
-    && docker-php-ext-install pdo pdo_pgsql
+    && docker-php-ext-install \
+        pdo \
+        pdo_pgsql \
+        zip \
+        intl
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -23,4 +29,9 @@ RUN php artisan storage:link || true
 
 EXPOSE 10000
 
-CMD php artisan serve --host=0.0.0.0 --port=10000
+CMD php artisan migrate --force && \
+    php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan view:cache && \
+    php artisan db:seed --force && \
+    php artisan serve --host=0.0.0.0 --port=10000
