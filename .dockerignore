@@ -2,4 +2,4 @@
 .git
 node_modules
 vendor
-storage/logs
+storage/logs/*
