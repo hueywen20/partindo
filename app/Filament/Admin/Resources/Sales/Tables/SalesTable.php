@@ -44,11 +44,10 @@ class SalesTable
                     ->currency()
                     ->sortable(),
 
-                TextColumn::make('cost')
+               TextColumn::make('cost')
                     ->label('Cost')
                     ->prefix('Rp ')
                     ->getStateUsing(fn (Sale $record) => number_format($record->cost, 2))
-                    ->toggleable(isToggledHiddenByDefault: true)
                     ->visible(fn () => Auth::user()?->canViewProfit() ?? false),
 
                 TextColumn::make('profit')
@@ -56,7 +55,6 @@ class SalesTable
                     ->prefix('Rp ')
                     ->getStateUsing(fn (Sale $record) => number_format($record->profit, 2))
                     ->color(fn (Sale $record) => $record->profit >= 0 ? 'success' : 'danger')
-                    ->toggleable(isToggledHiddenByDefault: true)
                     ->visible(fn () => Auth::user()?->canViewProfit() ?? false),
 
                 TextColumn::make('payment_type')

@@ -11,17 +11,8 @@ class PurchaseItemObserver
      */
     public function created(PurchaseItem $purchaseItem): void
     {
-        //
-        // $product = $purchaseItem->product;
-
-        // $product->increment('stock', $purchaseItem->quantity);
-
-        
-        // $this->recalculateAvgCost($purchaseItem->product, $purchaseItem->quantity, $purchaseItem->price);
-        // $purchaseItem->product->increment('stock', $purchaseItem->quantity);
-
         $qty   = (float) ($purchaseItem->qty ?? 0);
-        $price = (float) ($purchaseItem->price ?? 0);
+        $price = $this->taxInclusivePrice($purchaseItem);
 
         if ($qty <= 0) return;
 
@@ -36,9 +27,9 @@ class PurchaseItemObserver
     public function updated(PurchaseItem $purchaseItem): void
     {
         $oldQty   = (float) ($purchaseItem->getOriginal('qty') ?? 0);
-        $oldPrice = (float) ($purchaseItem->getOriginal('price') ?? 0);
+        $oldPrice = $this->taxInclusivePrice($purchaseItem, (float) ($purchaseItem->getOriginal('price') ?? 0));
         $newQty   = (float) ($purchaseItem->qty ?? 0);
-        $newPrice = (float) ($purchaseItem->price ?? 0);
+        $newPrice = $this->taxInclusivePrice($purchaseItem);
 
         if ($oldQty === $newQty && $oldPrice === $newPrice) return;
 
@@ -66,11 +57,8 @@ class PurchaseItemObserver
      */
     public function deleted(PurchaseItem $purchaseItem): void
     {
-        //
-        // $purchaseItem->product->decrement('stock', $purchaseItem->quantity);
-    
         $qty   = (float) ($purchaseItem->qty ?? 0);
-        $price = (float) ($purchaseItem->price ?? 0);
+        $price = $this->taxInclusivePrice($purchaseItem);
 
         if ($qty <= 0) return;
 
@@ -105,6 +93,19 @@ class PurchaseItemObserver
     public function forceDeleted(PurchaseItem $purchaseItem): void
     {
         //
+    }
+
+    /**
+     * The purchase's tax is applied invoice-wide (Purchase::tax, a %), not per line.
+     * Gross up this item's unit price by that same rate so avg_cost reflects the
+     * true landed cost per unit, matching what the business actually paid.
+     */
+    private function taxInclusivePrice(PurchaseItem $purchaseItem, ?float $priceOverride = null): float
+    {
+        $price = $priceOverride ?? (float) ($purchaseItem->price ?? 0);
+        $taxRate = (float) ($purchaseItem->purchase->tax ?? 0);
+
+        return round($price * (1 + ($taxRate / 100)), 2);
     }
 
     private function recalculateAvgCost($product, float $incomingQty, float $incomingPrice): void
