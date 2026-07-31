@@ -2,6 +2,7 @@
 
 namespace App\Filament\Concerns;
 
+use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
 
@@ -15,6 +16,8 @@ use Illuminate\Database\QueryException;
  * is the real safety net (see migration 2026_07_27_130000); this trait makes
  * that collision invisible to the user by silently retrying with a fresh
  * number instead of surfacing a raw database error.
+ *
+ * @mixin CreateRecord
  */
 trait RetriesOnDuplicateNumber
 {
@@ -34,9 +37,10 @@ trait RetriesOnDuplicateNumber
 
         for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
             try {
-                $model = static::getModel();
+                /** @var class-string<Model> $modelClass */
+                $modelClass = $this->getModel();
 
-                return $model::create($data);
+                return $modelClass::create($data);
             } catch (QueryException $e) {
                 $isLastAttempt = $attempt === $maxAttempts;
 
