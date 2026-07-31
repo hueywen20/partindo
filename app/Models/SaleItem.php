@@ -32,4 +32,10 @@ class SaleItem extends Model
     {
         return $this->hasMany(SaleItemComponent::class);
     }
+
+    public function returns()
+    {
+        return $this->hasMany(SalesReturnItem::class);
+    }
+    
 }

@@ -26,6 +26,11 @@ class User extends Authenticatable implements Auditable
     {
         return $this->hasAnyRole(['super_admin', 'Admin']);
     }
+
+    public function canApproveReturns(): bool
+    {
+        return $this->hasAnyRole(['super_admin', 'Admin']);
+    }
     /**
      * Get the attributes that should be cast.
      *

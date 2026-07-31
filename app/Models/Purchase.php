@@ -32,6 +32,10 @@ class Purchase extends Model implements Auditable
         return $this->belongsTo(Supplier::class);
     }
 
+    public function purchaseReturns()
+    {
+        return $this->hasMany(PurchaseReturn::class);
+    }
 
     protected static function booted()
     {

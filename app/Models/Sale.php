@@ -53,6 +53,11 @@ class Sale extends Model implements Auditable
         return $this->hasMany(Payment::class);
     }
 
+    public function salesReturns()
+    {
+        return $this->hasMany(SalesReturn::class);
+    }
+
     // ─── Payment status ───────────────────────────────────────────────────────
 
     public function isCredit(): bool
@@ -63,6 +68,18 @@ class Sale extends Model implements Auditable
     public function getPaidAmountAttribute(): float
     {
         return (float) $this->payments()->sum('amount');
+    }
+
+    /**
+    * Sum of approved sales returns against this invoice. Treated as a
+    * credit toward the balance, same as a cash payment — the original
+    * invoice total is never mutated, so this stays fully auditable.
+    */
+    public function getReturnedAmountAttribute(): float
+    {
+        return (float) $this->salesReturns()
+            ->where('status', 'approved')
+            ->sum('final_total');
     }
 
     public function getBalanceAttribute(): float
@@ -96,10 +113,10 @@ class Sale extends Model implements Auditable
         if (! $this->isCredit()) {
             $status = 'paid';
         } else {
-            $paid = $this->paid_amount;
+            $settled = $this->paid_amount + $this->returned_amount;
             $status = match (true) {
-                $paid <= 0 => 'unpaid',
-                $paid < (float) $this->final_total => 'partial',
+                $settled <= 0 => 'unpaid',
+                $settled < (float) $this->final_total => 'partial',
                 default => 'paid',
             };
         }
