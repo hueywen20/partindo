@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\SaleItem;
 use App\Models\SalesReturn;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -79,7 +80,7 @@ class SalesReturnService
         });
     }
 
-    private static function restockItem($returnItem): void
+    private static function restockItem(SaleItem $returnItem): void
     {
         $saleItem = $returnItem->saleItem;
         $product = $returnItem->product;
@@ -98,7 +99,7 @@ class SalesReturnService
         $product->increment('stock', $qty);
     }
 
-    private static function unstockItem($returnItem): void
+    private static function unstockItem(SaleItem$returnItem): void
     {
         $saleItem = $returnItem->saleItem;
         $product = $returnItem->product;
@@ -123,7 +124,7 @@ class SalesReturnService
      * SaleItemObserver). A return needs to reverse that same proportion,
      * scaled to how much of the original line is being returned.
      */
-    private static function adjustComposite($saleItem, float $returnQty, bool $increment): void
+    private static function adjustComposite(SaleItem $saleItem, float $returnQty, bool $increment): void
     {
         $originalQty = (float) $saleItem->qty;
 

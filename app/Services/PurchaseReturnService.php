@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Product;
 use App\Models\PurchaseReturn;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -82,7 +83,7 @@ class PurchaseReturnService
      * tax-inclusive price snapshot rather than the (possibly since
      * changed) current purchase item price.
      */
-    private static function removeFromStock($returnItem): void
+    private static function removeFromStock(Product $returnItem): void
     {
         $product = $returnItem->product;
         $qty = (float) $returnItem->qty;
@@ -109,7 +110,7 @@ class PurchaseReturnService
      * Reverses removeFromStock() — used when an approved return is
      * reverted back to pending.
      */
-    private static function addBackToStock($returnItem): void
+    private static function addBackToStock(Product $returnItem): void
     {
         $product = $returnItem->product;
         $qty = (float) $returnItem->qty;

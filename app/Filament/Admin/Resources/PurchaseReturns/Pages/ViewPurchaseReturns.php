@@ -24,7 +24,10 @@ class ViewPurchaseReturn extends ViewRecord
                 ->color('success')
                 ->requiresConfirmation()
                 ->modalDescription('This will remove the returned item(s) from stock and adjust the average cost.')
-                ->visible(fn (PurchaseReturn $record) => $record->isPending() && (Auth::user()?->canApproveReturns() ?? false))
+                // ->visible(fn (PurchaseReturn $record) => $record->isPending() && (Auth::user()?->canApproveReturns() ?? false))
+                ->visible(fn (PurchaseReturn $record) => 
+                        $record->isPending() && auth()->Auth::user()?->can('approve', $record)
+                    )
                 ->action(function (PurchaseReturn $record) {
                     PurchaseReturnService::approve($record, Auth::user());
                     Notification::make()->title('Return approved')->success()->send();
@@ -36,7 +39,10 @@ class ViewPurchaseReturn extends ViewRecord
                 ->icon('heroicon-o-x-circle')
                 ->color('danger')
                 ->requiresConfirmation()
-                ->visible(fn (PurchaseReturn $record) => $record->isPending() && (Auth::user()?->canApproveReturns() ?? false))
+                // ->visible(fn (PurchaseReturn $record) => $record->isPending() && (Auth::user()?->canApproveReturns() ?? false))
+                ->visible(fn (PurchaseReturn $record) => 
+                        $record->isPending() && auth()->Auth::user()?->can('approve', $record)
+                    )
                 ->action(function (PurchaseReturn $record) {
                     PurchaseReturnService::reject($record, Auth::user());
                     Notification::make()->title('Return rejected')->success()->send();
@@ -49,7 +55,10 @@ class ViewPurchaseReturn extends ViewRecord
                 ->color('warning')
                 ->requiresConfirmation()
                 ->modalDescription('This undoes the stock/cost effects of this approval and sends it back to pending. Use only to correct a mistake.')
-                ->visible(fn (PurchaseReturn $record) => $record->isApproved() && (Auth::user()?->canApproveReturns() ?? false))
+                // ->visible(fn (PurchaseReturn $record) => $record->isApproved() && (Auth::user()?->canApproveReturns() ?? false))
+                ->visible(fn (PurchaseReturn $record) => 
+                        $record->isApproved() && auth()->Auth::user()?->can('approve', $record)
+                    )
                 ->action(function (PurchaseReturn $record) {
                     PurchaseReturnService::revert($record, Auth::user());
                     Notification::make()->title('Return reverted to pending')->success()->send();

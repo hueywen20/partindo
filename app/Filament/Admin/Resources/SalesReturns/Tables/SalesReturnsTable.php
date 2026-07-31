@@ -76,7 +76,10 @@ class SalesReturnsTable
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->visible(fn (SalesReturn $record) => $record->isPending() && (Auth::user()?->canApproveReturns() ?? false))
+                    // ->visible(fn (SalesReturn $record) => $record->isPending() && (Auth::user()?->canApproveReturns() ?? false))
+                     ->visible(fn (SalesReturn $record) => 
+                        $record->isPending() && auth()->Auth::user()?->can('approve', $record)
+                    )
                     ->action(function (SalesReturn $record) {
                         SalesReturnService::approve($record, Auth::user());
                         Notification::make()->title('Return approved')->success()->send();
@@ -87,7 +90,10 @@ class SalesReturnsTable
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
                     ->requiresConfirmation()
-                    ->visible(fn (SalesReturn $record) => $record->isPending() && (Auth::user()?->canApproveReturns() ?? false))
+                    // ->visible(fn (SalesReturn $record) => $record->isPending() && (Auth::user()?->canApproveReturns() ?? false))
+                     ->visible(fn (SalesReturn $record) => 
+                        $record->isPending() && auth()->Auth::user()?->can('approve', $record)
+                    )
                     ->action(function (SalesReturn $record) {
                         SalesReturnService::reject($record, Auth::user());
                         Notification::make()->title('Return rejected')->success()->send();
