@@ -2,13 +2,13 @@
 
 namespace App\Filament\Admin\Resources\PurchaseReturns\Pages;
 
-use App\Filament\Admin\Resources\PurchaseReturns\PurchaseReturnResource;
+use App\Filament\Admin\Resources\PurchaseReturns\PurchaseReturnsResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
-class EditPurchaseReturn extends EditRecord
+class EditPurchaseReturns extends EditRecord
 {
-    protected static string $resource = PurchaseReturnResource::class;
+    protected static string $resource = PurchaseReturnsResource::class;
 
     protected function getHeaderActions(): array
     {

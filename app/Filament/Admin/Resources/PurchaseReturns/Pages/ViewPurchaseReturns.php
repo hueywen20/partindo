@@ -2,7 +2,7 @@
 
 namespace App\Filament\Admin\Resources\PurchaseReturns\Pages;
 
-use App\Filament\Admin\Resources\PurchaseReturns\PurchaseReturnResource;
+use App\Filament\Admin\Resources\PurchaseReturns\PurchaseReturnsResource;
 use App\Models\PurchaseReturn;
 use App\Services\PurchaseReturnService;
 use Filament\Actions\Action;
@@ -11,9 +11,9 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Support\Facades\Auth;
 
-class ViewPurchaseReturn extends ViewRecord
+class ViewPurchaseReturns extends ViewRecord
 {
-    protected static string $resource = PurchaseReturnResource::class;
+    protected static string $resource = PurchaseReturnsResource::class;
 
     protected function getHeaderActions(): array
     {

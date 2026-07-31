@@ -2,11 +2,12 @@
 
 namespace App\Filament\Admin\Resources\SalesReturns;
 
-use App\Filament\Admin\Resources\SalesReturns\Pages\CreateSalesReturn;
-use App\Filament\Admin\Resources\SalesReturns\Pages\EditSalesReturn;
+use App\Filament\Admin\Resources\SalesReturns\Pages\CreateSalesReturns;
+use App\Filament\Admin\Resources\SalesReturns\Pages\EditSalesReturns;
 use App\Filament\Admin\Resources\SalesReturns\Pages\ListSalesReturns;
-use App\Filament\Admin\Resources\SalesReturns\Pages\ViewSalesReturn;
+use App\Filament\Admin\Resources\SalesReturns\Pages\ViewSalesReturns;
 use App\Filament\Admin\Resources\SalesReturns\Schemas\SalesReturnForm;
+use App\Filament\Admin\Resources\SalesReturns\Schemas\SalesReturnsForm;
 use App\Filament\Admin\Resources\SalesReturns\Tables\SalesReturnsTable;
 use App\Models\SalesReturn;
 use BackedEnum;
@@ -16,7 +17,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
 
-class SalesReturnResource extends Resource
+class SalesReturnsResource extends Resource
 {
     protected static ?string $model = SalesReturn::class;
 
@@ -63,9 +64,9 @@ class SalesReturnResource extends Resource
     {
         return [
             'index' => ListSalesReturns::route('/'),
-            'create' => CreateSalesReturn::route('/create'),
-            'view' => ViewSalesReturn::route('/{record}'),
-            'edit' => EditSalesReturn::route('/{record}/edit'),
+            'create' => CreateSalesReturns::route('/create'),
+            'view' => ViewSalesReturns::route('/{record}'),
+            'edit' => EditSalesReturns::route('/{record}/edit'),
         ];
     }
 }

@@ -2,18 +2,18 @@
 
 namespace App\Filament\Admin\Resources\SalesReturns\Pages;
 
-use App\Filament\Admin\Resources\SalesReturns\SalesReturnResource;
+use App\Filament\Admin\Resources\SalesReturns\SalesReturnsResource;
 use App\Filament\Concerns\RetriesOnDuplicateNumber;
 use App\Models\Sale;
 use App\Services\SalesReturnNumberService;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
 
-class CreateSalesReturn extends CreateRecord
+class CreateSalesReturns extends CreateRecord
 {
     use RetriesOnDuplicateNumber;
 
-    protected static string $resource = SalesReturnResource::class;
+    protected static string $resource = SalesReturnsResource::class;
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {

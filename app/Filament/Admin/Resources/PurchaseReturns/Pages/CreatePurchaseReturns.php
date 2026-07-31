@@ -2,18 +2,18 @@
 
 namespace App\Filament\Admin\Resources\PurchaseReturns\Pages;
 
-use App\Filament\Admin\Resources\PurchaseReturns\PurchaseReturnResource;
+use App\Filament\Admin\Resources\PurchaseReturns\PurchaseReturnsResource;
 use App\Filament\Concerns\RetriesOnDuplicateNumber;
 use App\Models\Purchase;
 use App\Services\PurchaseReturnNumberService;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
 
-class CreatePurchaseReturn extends CreateRecord
+class CreatePurchaseReturns extends CreateRecord
 {
     use RetriesOnDuplicateNumber;
 
-    protected static string $resource = PurchaseReturnResource::class;
+    protected static string $resource = PurchaseReturnsResource::class;
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {

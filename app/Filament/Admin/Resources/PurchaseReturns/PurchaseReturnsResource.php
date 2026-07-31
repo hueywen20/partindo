@@ -2,12 +2,14 @@
 
 namespace App\Filament\Admin\Resources\PurchaseReturns;
 
-use App\Filament\Admin\Resources\PurchaseReturns\Pages\CreatePurchaseReturn;
-use App\Filament\Admin\Resources\PurchaseReturns\Pages\EditPurchaseReturn;
+use App\Filament\Admin\Resources\PurchaseReturns\Pages\CreatePurchaseReturns;
+use App\Filament\Admin\Resources\PurchaseReturns\Pages\EditPurchaseReturns;
 use App\Filament\Admin\Resources\PurchaseReturns\Pages\ListPurchaseReturns;
-use App\Filament\Admin\Resources\PurchaseReturns\Pages\ViewPurchaseReturn;
+use App\Filament\Admin\Resources\PurchaseReturns\Pages\ViewPurchaseReturns;
 use App\Filament\Admin\Resources\PurchaseReturns\Schemas\PurchaseReturnForm;
+use App\Filament\Admin\Resources\PurchaseReturns\Schemas\PurchaseReturnsForm;
 use App\Filament\Admin\Resources\PurchaseReturns\Tables\PurchaseReturnsTable;
+use App\Models\Purchase;
 use App\Models\PurchaseReturn;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -16,7 +18,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
 
-class PurchaseReturnResource extends Resource
+class PurchaseReturnsResource extends Resource
 {
     protected static ?string $model = PurchaseReturn::class;
 
@@ -37,7 +39,7 @@ class PurchaseReturnResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return PurchaseReturnForm::configure($schema);
+        return PurchaseReturnsForm::configure($schema);
     }
 
     public static function table(Table $table): Table
@@ -59,9 +61,9 @@ class PurchaseReturnResource extends Resource
     {
         return [
             'index' => ListPurchaseReturns::route('/'),
-            'create' => CreatePurchaseReturn::route('/create'),
-            'view' => ViewPurchaseReturn::route('/{record}'),
-            'edit' => EditPurchaseReturn::route('/{record}/edit'),
+            'create' => CreatePurchaseReturns::route('/create'),
+            'view' => ViewPurchaseReturns::route('/{record}'),
+            'edit' => EditPurchaseReturns::route('/{record}/edit'),
         ];
     }
 }

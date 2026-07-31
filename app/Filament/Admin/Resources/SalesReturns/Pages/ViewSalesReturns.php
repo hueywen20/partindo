@@ -2,7 +2,7 @@
 
 namespace App\Filament\Admin\Resources\SalesReturns\Pages;
 
-use App\Filament\Admin\Resources\SalesReturns\SalesReturnResource;
+use App\Filament\Admin\Resources\SalesReturns\SalesReturnsResource;
 use App\Models\SalesReturn;
 use App\Services\SalesReturnService;
 use Filament\Actions\Action;
@@ -11,9 +11,9 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Support\Facades\Auth;
 
-class ViewSalesReturn extends ViewRecord
+class ViewSalesReturns extends ViewRecord
 {
-    protected static string $resource = SalesReturnResource::class;
+    protected static string $resource = SalesReturnsResource::class;
 
     protected function getHeaderActions(): array
     {
