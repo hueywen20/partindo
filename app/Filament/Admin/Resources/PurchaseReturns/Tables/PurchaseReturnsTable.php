@@ -76,9 +76,8 @@ class PurchaseReturnsTable
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->requiresConfirmation()
-                    // ->visible(fn (PurchaseReturn $record) => $record->isPending() && (Auth::user()?->canApproveReturns() ?? false))
                     ->visible(fn (PurchaseReturn $record) => 
-                        $record->isPending() && auth()->Auth::user()?->can('approve', $record)
+                        $record->isPending() && Auth::user()?->canApproveReturns() ?? false
                     )
                     ->action(function (PurchaseReturn $record) {
                         PurchaseReturnService::approve($record, Auth::user());
@@ -90,9 +89,8 @@ class PurchaseReturnsTable
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
                     ->requiresConfirmation()
-                    // ->visible(fn (PurchaseReturn $record) => $record->isPending() && (Auth::user()?->canApproveReturns() ?? false))
                     ->visible(fn (PurchaseReturn $record) => 
-                        $record->isPending() && auth()->Auth::user()?->can('approve', $record)
+                        $record->isPending() && Auth::user()?->canApproveReturns() ?? false
                     )
                     ->action(function (PurchaseReturn $record) {
                         PurchaseReturnService::reject($record, Auth::user());

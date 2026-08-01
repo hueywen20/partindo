@@ -26,7 +26,7 @@ class ViewPurchaseReturns extends ViewRecord
                 ->modalDescription('This will remove the returned item(s) from stock and adjust the average cost.')
                 // ->visible(fn (PurchaseReturn $record) => $record->isPending() && (Auth::user()?->canApproveReturns() ?? false))
                 ->visible(fn (PurchaseReturn $record) => 
-                        $record->isPending() && auth()->Auth::user()?->can('approve', $record)
+                        $record->isPending() && Auth::user()?->canApproveReturns() ?? false
                     )
                 ->action(function (PurchaseReturn $record) {
                     PurchaseReturnService::approve($record, Auth::user());
@@ -41,7 +41,7 @@ class ViewPurchaseReturns extends ViewRecord
                 ->requiresConfirmation()
                 // ->visible(fn (PurchaseReturn $record) => $record->isPending() && (Auth::user()?->canApproveReturns() ?? false))
                 ->visible(fn (PurchaseReturn $record) => 
-                        $record->isPending() && auth()->Auth::user()?->can('approve', $record)
+                        $record->isPending() && Auth::user()?->canApproveReturns() ?? false
                     )
                 ->action(function (PurchaseReturn $record) {
                     PurchaseReturnService::reject($record, Auth::user());
@@ -57,7 +57,7 @@ class ViewPurchaseReturns extends ViewRecord
                 ->modalDescription('This undoes the stock/cost effects of this approval and sends it back to pending. Use only to correct a mistake.')
                 // ->visible(fn (PurchaseReturn $record) => $record->isApproved() && (Auth::user()?->canApproveReturns() ?? false))
                 ->visible(fn (PurchaseReturn $record) => 
-                        $record->isApproved() && auth()->Auth::user()?->can('approve', $record)
+                        $record->isApproved() && Auth::user()?->canApproveReturns() ?? false
                     )
                 ->action(function (PurchaseReturn $record) {
                     PurchaseReturnService::revert($record, Auth::user());

@@ -25,6 +25,11 @@ class Customer extends Model implements Auditable
         return $this->hasMany(Payment::class);
     }
 
+    public function salesReturns()
+    {
+        return $this->hasMany(SalesReturn::class);
+    }
+
     // ─── Debt helpers ─────────────────────────────────────────────────────────
 
     /**

@@ -26,7 +26,7 @@ class ViewSalesReturns extends ViewRecord
                 ->modalDescription('This will restock the returned item(s) and, for a credit sale, reduce the customer\'s outstanding balance.')
                 // ->visible(fn (SalesReturn $record) => $record->isPending() && (Auth::user()?->canApproveReturns() ?? false))
                  ->visible(fn (SalesReturn $record) => 
-                        $record->isPending() && auth()->Auth::user()?->can('approve', $record)
+                        $record->isPending() && Auth::user()?->canApproveReturns() ?? false
                     )
                 ->action(function (SalesReturn $record) {
                     SalesReturnService::approve($record, Auth::user());
@@ -41,7 +41,7 @@ class ViewSalesReturns extends ViewRecord
                 ->requiresConfirmation()
                 // ->visible(fn (SalesReturn $record) => $record->isPending() && (Auth::user()?->canApproveReturns() ?? false))
                 ->visible(fn (SalesReturn $record) => 
-                        $record->isPending() && auth()->Auth::user()?->can('approve', $record)
+                        $record->isPending() && Auth::user()?->canApproveReturns() ?? false
                     )
                 ->action(function (SalesReturn $record) {
                     SalesReturnService::reject($record, Auth::user());
@@ -57,7 +57,7 @@ class ViewSalesReturns extends ViewRecord
                 ->modalDescription('This undoes the stock/balance effects of this approval and sends it back to pending. Use only to correct a mistake.')
                 // ->visible(fn (SalesReturn $record) => $record->isApproved() && (Auth::user()?->canApproveReturns() ?? false))
                 ->visible(fn (SalesReturn $record) => 
-                        $record->isApproved() && auth()->Auth::user()?->can('approve', $record)
+                        $record->isApproved() && Auth::user()?->canApproveReturns() ?? false
                     )
                 ->action(function (SalesReturn $record) {
                     SalesReturnService::revert($record, Auth::user());

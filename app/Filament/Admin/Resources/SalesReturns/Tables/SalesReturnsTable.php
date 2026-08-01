@@ -78,7 +78,7 @@ class SalesReturnsTable
                     ->requiresConfirmation()
                     // ->visible(fn (SalesReturn $record) => $record->isPending() && (Auth::user()?->canApproveReturns() ?? false))
                      ->visible(fn (SalesReturn $record) => 
-                        $record->isPending() && auth()->Auth::user()?->can('approve', $record)
+                        $record->isPending() && Auth::user()?->canApproveReturns() ?? false
                     )
                     ->action(function (SalesReturn $record) {
                         SalesReturnService::approve($record, Auth::user());
@@ -92,7 +92,7 @@ class SalesReturnsTable
                     ->requiresConfirmation()
                     // ->visible(fn (SalesReturn $record) => $record->isPending() && (Auth::user()?->canApproveReturns() ?? false))
                      ->visible(fn (SalesReturn $record) => 
-                        $record->isPending() && auth()->Auth::user()?->can('approve', $record)
+                        $record->isPending() && Auth::user()?->canApproveReturns() ?? false
                     )
                     ->action(function (SalesReturn $record) {
                         SalesReturnService::reject($record, Auth::user());

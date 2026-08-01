@@ -32,11 +32,15 @@ class StockLedgerRelationManager extends RelationManager
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'purchase' => 'Purchase',
                         'sale' => 'Sale',
+                        'sales_return' => 'Sales Return',
+                        'purchase_return' => 'Purchase Return',
                         default => ucfirst($state),
                     })
                     ->color(fn (string $state): string => match ($state) {
                         'purchase' => 'success',
                         'sale' => 'danger',
+                        'sales_return' => 'info',
+                        'purchase_return' => 'warning',
                         default => 'gray',
                     }),
 
@@ -83,14 +87,20 @@ class StockLedgerRelationManager extends RelationManager
                TextColumn::make('buying_price')
                     ->label('Buying Price (Cost)')
                     ->getStateUsing(function (Model $record) {
-                        if ($record->type !== 'purchase' || !$record->buying_price) {
-                            return '-';
+                        if ($record->type === 'purchase' && $record->buying_price) {
+                            $tax = (float) ($record->tax ?? 0);
+                            $priceWithTax = (float) $record->buying_price * (1 + $tax / 100);
+
+                            return 'Rp ' . number_format($priceWithTax, 0, ',', '.');
                         }
 
-                        $tax = (float) ($record->tax ?? 0);
-                        $priceWithTax = (float) $record->buying_price * (1 + $tax / 100);
+                        // Purchase return prices are already tax-inclusive snapshots
+                        // (see PurchaseReturnForm), so no further tax math needed.
+                        if ($record->type === 'purchase_return' && $record->buying_price) {
+                            return 'Rp ' . number_format((float) $record->buying_price, 0, ',', '.');
+                        }
 
-                        return 'Rp ' . number_format($priceWithTax, 0, ',', '.');
+                        return '-';
                     }),
 
                 TextColumn::make('selling_price')
@@ -103,7 +113,13 @@ class StockLedgerRelationManager extends RelationManager
                     ->label('Reference')
                     ->searchable()
                     ->badge()
-                    ->color(fn (Model $record): string => $record->type === 'purchase' ? 'success' : 'danger'),
+                    ->color(fn (Model $record): string => match ($record->type) {
+                        'purchase' => 'success',
+                        'sale' => 'danger',
+                        'sales_return' => 'info',
+                        'purchase_return' => 'warning',
+                        default => 'gray',
+                    }),
             ])
             ->defaultSort('transaction_date', 'desc')
             ->headerActions([])
@@ -168,7 +184,65 @@ class StockLedgerRelationManager extends RelationManager
                 DB::raw('NULL as tax'),
             ]);
 
-        $ledger = $purchases->unionAll($sales);
+        // Customer returns goods to us — stock comes back IN. Only approved
+        // returns have actually happened; pending/rejected ones are excluded.
+        $salesReturns = DB::table('sales_return_items')
+            ->join('sales_returns', 'sales_returns.id', '=', 'sales_return_items.sales_return_id')
+            ->join('products', 'products.id', '=', 'sales_return_items.product_id')
+            ->leftJoin('brands', 'brands.id', '=', 'products.brand')
+            ->leftJoin('customers', 'customers.id', '=', 'sales_returns.customer_id')
+            ->where('sales_return_items.product_id', $productId)
+            ->where('sales_returns.status', 'approved')
+            ->select([
+                DB::raw('(2000000000000 + sales_return_items.id) as id'),
+                DB::raw('sales_return_items.product_id as product_id'),
+                DB::raw("'sales_return' as type"),
+                DB::raw('sales_returns.date as transaction_date'),
+                DB::raw('3 as sort_order'),
+                DB::raw('sales_return_items.id as source_id'),
+                DB::raw('sales_return_items.part_no as part_no'),
+                DB::raw('products.name as product_name'),
+                DB::raw('COALESCE(sales_return_items.brand, brands.name) as brand'),
+                DB::raw('customers.customer_name as partner_name'),
+                DB::raw('sales_return_items.qty as in_qty'),
+                DB::raw('0 as out_qty'),
+                DB::raw('sales_return_items.cost_price as buying_price'),
+                DB::raw('sales_return_items.price as selling_price'),
+                DB::raw('sales_returns.return_no as reference'),
+                DB::raw('sales_returns.id as ref_id'),
+                DB::raw('NULL as tax'),
+            ]);
+
+        // Goods physically leave us back to the supplier — stock goes OUT.
+        // Only approved returns count.
+        $purchaseReturns = DB::table('purchase_return_items')
+            ->join('purchase_returns', 'purchase_returns.id', '=', 'purchase_return_items.purchase_return_id')
+            ->join('products', 'products.id', '=', 'purchase_return_items.product_id')
+            ->leftJoin('brands', 'brands.id', '=', 'products.brand')
+            ->leftJoin('suppliers', 'suppliers.id', '=', 'purchase_returns.supplier_id')
+            ->where('purchase_return_items.product_id', $productId)
+            ->where('purchase_returns.status', 'approved')
+            ->select([
+                DB::raw('(3000000000000 + purchase_return_items.id) as id'),
+                DB::raw('purchase_return_items.product_id as product_id'),
+                DB::raw("'purchase_return' as type"),
+                DB::raw('purchase_returns.date as transaction_date'),
+                DB::raw('4 as sort_order'),
+                DB::raw('purchase_return_items.id as source_id'),
+                DB::raw('purchase_return_items.part_no as part_no'),
+                DB::raw('products.name as product_name'),
+                DB::raw('COALESCE(purchase_return_items.brand, brands.name) as brand'),
+                DB::raw('suppliers.company_name as partner_name'),
+                DB::raw('0 as in_qty'),
+                DB::raw('purchase_return_items.qty as out_qty'),
+                DB::raw('purchase_return_items.price as buying_price'),
+                DB::raw('NULL as selling_price'),
+                DB::raw('purchase_returns.return_no as reference'),
+                DB::raw('purchase_returns.id as ref_id'),
+                DB::raw('NULL as tax'),
+            ]);
+
+        $ledger = $purchases->unionAll($sales)->unionAll($salesReturns)->unionAll($purchaseReturns);
 
         return \App\Models\PurchaseItem::query()
             ->from(DB::raw("(
