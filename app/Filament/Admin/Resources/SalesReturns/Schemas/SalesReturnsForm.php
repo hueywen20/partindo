@@ -13,7 +13,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
-class SalesReturnForm
+class SalesReturnsForm
 {
     public static function parseNumber(mixed $value): float
     {

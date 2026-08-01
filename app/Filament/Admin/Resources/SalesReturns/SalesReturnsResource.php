@@ -6,7 +6,6 @@ use App\Filament\Admin\Resources\SalesReturns\Pages\CreateSalesReturns;
 use App\Filament\Admin\Resources\SalesReturns\Pages\EditSalesReturns;
 use App\Filament\Admin\Resources\SalesReturns\Pages\ListSalesReturns;
 use App\Filament\Admin\Resources\SalesReturns\Pages\ViewSalesReturns;
-use App\Filament\Admin\Resources\SalesReturns\Schemas\SalesReturnForm;
 use App\Filament\Admin\Resources\SalesReturns\Schemas\SalesReturnsForm;
 use App\Filament\Admin\Resources\SalesReturns\Tables\SalesReturnsTable;
 use App\Models\SalesReturn;
@@ -38,7 +37,7 @@ class SalesReturnsResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return SalesReturnForm::configure($schema);
+        return SalesReturnsForm::configure($schema);    
     }
 
     public static function table(Table $table): Table
