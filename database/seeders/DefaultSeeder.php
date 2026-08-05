@@ -12,8 +12,9 @@ class DefaultSeeder extends Seeder
     {
         DB::table('users')->insert([
             'name' => 'Admin',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('password'),
+            'username' => env('ADMIN_USERNAME', 'admin'),
+            'email' => env('ADMIN_EMAIL', 'admin@example.com'),
+            'password' => Hash::make(env('ADMIN_PASSWORD', str()->random(16))),
         ]);
     }
 }

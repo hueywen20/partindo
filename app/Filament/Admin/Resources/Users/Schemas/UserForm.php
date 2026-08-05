@@ -14,23 +14,28 @@ class UserForm
         return $schema
             ->components([
                 TextInput::make('name')
-                    ->required(),
-                TextInput::make('email')
-                    ->label('Email address')
-                    ->email()
-                    ->required(),
-                // DateTimePicker::make('email_verified_at'),
-                TextInput::make('password')
-                    ->password()
-                    ->dehydrateStateUsing(fn ($state) => filled($state) ? bcrypt($state) : null)
-                    ->dehydrated(fn ($state) => filled($state))
-                    ->required(fn (string $operation) => $operation === 'create'),
-                Select::make('roles')
-                    ->relationship('roles', 'name')
-                    ->multiple()
-                    ->preload()
-                    ->searchable()
-                    ->columnSpanFull(),
+                ->required(),
+            TextInput::make('username')
+                ->label('Username')
+                ->required()
+                ->unique(ignoreRecord: true)
+                ->alphaDash()
+                ->maxLength(255),
+            TextInput::make('email')
+                ->label('Email address')
+                ->email()
+                ->required(),
+            TextInput::make('password')
+                ->password()
+                ->dehydrateStateUsing(fn ($state) => filled($state) ? bcrypt($state) : null)
+                ->dehydrated(fn ($state) => filled($state))
+                ->required(fn (string $operation) => $operation === 'create'),
+            Select::make('roles')
+                ->relationship('roles', 'name')
+                ->multiple()
+                ->preload()
+                ->searchable()
+                ->columnSpanFull(),
         ]);
     }
 }
