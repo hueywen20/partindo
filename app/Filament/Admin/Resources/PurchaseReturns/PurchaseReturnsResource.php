@@ -6,10 +6,8 @@ use App\Filament\Admin\Resources\PurchaseReturns\Pages\CreatePurchaseReturns;
 use App\Filament\Admin\Resources\PurchaseReturns\Pages\EditPurchaseReturns;
 use App\Filament\Admin\Resources\PurchaseReturns\Pages\ListPurchaseReturns;
 use App\Filament\Admin\Resources\PurchaseReturns\Pages\ViewPurchaseReturns;
-use App\Filament\Admin\Resources\PurchaseReturns\Schemas\PurchaseReturnForm;
 use App\Filament\Admin\Resources\PurchaseReturns\Schemas\PurchaseReturnsForm;
 use App\Filament\Admin\Resources\PurchaseReturns\Tables\PurchaseReturnsTable;
-use App\Models\Purchase;
 use App\Models\PurchaseReturn;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -47,14 +45,19 @@ class PurchaseReturnsResource extends Resource
         return PurchaseReturnsTable::configure($table);
     }
 
+    /**
+     * A return is a financial record once it's been acted on — only
+     * pending (untouched) returns can still be edited or deleted, and
+     * only by someone with the matching permission.
+     */
     public static function canEdit(Model $record): bool
     {
-        return $record->status === 'pending';
+        return $record->status === 'pending' && (auth()->user()?->can('edit_purchase_returns') ?? false);
     }
 
     public static function canDelete(Model $record): bool
     {
-        return $record->status === 'pending';
+        return $record->status === 'pending' && (auth()->user()?->can('delete_purchase_returns') ?? false);
     }
 
     public static function getPages(): array

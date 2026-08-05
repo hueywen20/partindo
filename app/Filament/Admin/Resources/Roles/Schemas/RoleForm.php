@@ -11,6 +11,13 @@ use Spatie\Permission\Models\Permission;
 
 class RoleForm
 {
+    /**
+     * Optional friendly overrides for specific permission checkbox labels.
+     * Anything not listed here falls back to a title-cased version of the
+     * permission name (see the ucfirst() fallback below).
+     */
+    private static array $labels = [];
+
     private static array $modules = [
          // ── Master Data ───────────────────────────────────────────────────────
         'Customers' => [
@@ -51,6 +58,14 @@ class RoleForm
         ],
         'Purchases' => [
             'view_purchases', 'create_purchases', 'edit_purchases', 'delete_purchases',
+        ],
+
+        // ── Returns ───────────────────────────────────────────────────────────
+        'Sales Returns' => [
+            'view_sales_returns', 'create_sales_returns', 'edit_sales_returns', 'delete_sales_returns',
+        ],
+        'Purchase Returns' => [
+            'view_purchase_returns', 'create_purchase_returns', 'edit_purchase_returns', 'delete_purchase_returns',
         ],
 
         // ── Finance & Reports ──────────────────────────────────────────────────

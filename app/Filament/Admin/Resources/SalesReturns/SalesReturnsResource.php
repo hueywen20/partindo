@@ -47,16 +47,17 @@ class SalesReturnsResource extends Resource
 
     /**
      * A return is a financial record once it's been acted on — only
-     * pending (untouched) returns can still be edited or deleted.
+     * pending (untouched) returns can still be edited or deleted, and
+     * only by someone with the matching permission.
      */
     public static function canEdit(Model $record): bool
     {
-        return $record->status === 'pending';
+        return $record->status === 'pending' && (auth()->user()?->can('edit_sales_returns') ?? false);
     }
 
     public static function canDelete(Model $record): bool
     {
-        return $record->status === 'pending';
+        return $record->status === 'pending' && (auth()->user()?->can('delete_sales_returns') ?? false);
     }
 
     public static function getPages(): array

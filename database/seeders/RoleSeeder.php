@@ -35,7 +35,7 @@ class RoleSeeder extends Seeder
             
             // ── Inventory ─────────────────────────────────────────────────
             'products' => [
-                'view_product', 'create_product', 'edit_product', 'delete_product',
+                'view_products', 'create_products', 'edit_products', 'delete_products',
             ],
 
             // ── Purchases ─────────────────────────────────────────────────
@@ -56,13 +56,13 @@ class RoleSeeder extends Seeder
                 'view_purchase_orders', 'create_purchase_orders', 'edit_purchase_orders', 'delete_purchase_orders'
             ],
 
-            // 'purchase_returns' => [
-            //     'view_purchase_returns', 'create_purchase_returns', 'edit_purchase_returns', 'delete_purchase_returns',
-            // ],
+            'purchase_returns' => [
+                'view_purchase_returns', 'create_purchase_returns', 'edit_purchase_returns', 'delete_purchase_returns',
+            ],
 
-            // 'sale_returns' => [
-            //     'view_sale_returns', 'create_sale_returns', 'edit_sale_returns', 'delete_sale_returns',
-            // ],
+            'sales_returns' => [
+                'view_sales_returns', 'create_sales_returns', 'edit_sales_returns', 'delete_sales_returns',
+            ],
 
             // 'stock_adjustment_plus' => [
             //     'view_stock_adjustment_plus', 'create_stock_adjustment_plus', 'edit_stock_adjustment_plus', 'delete_stock_adjustment_plus',
@@ -175,7 +175,7 @@ class RoleSeeder extends Seeder
                 'view_products',
                 'view_sales', 'create_sales', 'edit_sales',
                 'view_quotations', 'create_quotations', 'edit_quotations',
-                'view_sale_returns', 'create_sale_returns',
+                'view_sales_returns', 'create_sales_returns',
                 'report_sale_per_period_per_customer', 'report_sale_per_month',
             ],
         ];

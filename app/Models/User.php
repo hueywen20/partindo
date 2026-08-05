@@ -31,6 +31,11 @@ class User extends Authenticatable implements Auditable
     {
         return $this->hasAnyRole(['super_admin', 'Admin']);
     }
+
+    public function canAccessReports(): bool
+    {
+        return $this->hasAnyRole(['super_admin', 'Admin', 'Finance']);
+    }
     /**
      * Get the attributes that should be cast.
      *

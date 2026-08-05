@@ -12,12 +12,12 @@ class UomPolicy
 {
     use HandlesAuthorization;
 
-    public function viewAny(AuthUser $authUser): bool { return $authUser->can('view_uom'); }
-    public function view(AuthUser $authUser, Uom $uom): bool { return $authUser->can('view_uom'); }
-    public function create(AuthUser $authUser): bool { return $authUser->can('create_uom'); }
-    public function update(AuthUser $authUser, Uom $uom): bool { return $authUser->can('edit_uom'); }
-    public function delete(AuthUser $authUser, Uom $uom): bool { return $authUser->can('delete_uom'); }
-    public function deleteAny(AuthUser $authUser): bool { return $authUser->can('delete_uom'); }
+    public function viewAny(AuthUser $authUser): bool { return $authUser->can('view_uoms'); }
+    public function view(AuthUser $authUser, Uom $uom): bool { return $authUser->can('view_uoms'); }
+    public function create(AuthUser $authUser): bool { return $authUser->can('create_uoms'); }
+    public function update(AuthUser $authUser, Uom $uom): bool { return $authUser->can('edit_uoms'); }
+    public function delete(AuthUser $authUser, Uom $uom): bool { return $authUser->can('delete_uoms'); }
+    public function deleteAny(AuthUser $authUser): bool { return $authUser->can('delete_uoms'); }
     public function restore(AuthUser $authUser, Uom $uom): bool { return false; }
     public function forceDelete(AuthUser $authUser, Uom $uom): bool { return false; }
     public function forceDeleteAny(AuthUser $authUser): bool { return false; }

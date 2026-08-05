@@ -16,6 +16,10 @@ use UnitEnum;
 
 class StatementOfAccount extends Page implements HasForms
 {
+    public static function canAccess(): bool {
+        return auth()->user()?->canAccessReports() ?? false;
+    }
+    
     use InteractsWithForms;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-text';

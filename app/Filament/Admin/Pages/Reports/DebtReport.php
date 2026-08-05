@@ -21,6 +21,10 @@ use UnitEnum;
 
 class DebtReport extends Page implements HasTable
 {
+    public static function canAccess(): bool {
+        return auth()->user()?->canAccessReports() ?? false;
+    }
+
     use InteractsWithTable;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-exclamation-triangle';

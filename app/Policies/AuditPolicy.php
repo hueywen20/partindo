@@ -12,8 +12,8 @@ class AuditPolicy
 {
     use HandlesAuthorization;
 
-    public function viewAny(AuthUser $authUser): bool { return $authUser->can('view_audit_logs'); }
-    public function view(AuthUser $authUser, Audit $audit): bool { return $authUser->can('view_audit_logs'); }
+    public function viewAny(AuthUser $authUser): bool { return $authUser->can('view_audit'); }
+    public function view(AuthUser $authUser, Audit $audit): bool { return $authUser->can('view_audit'); }
     public function create(AuthUser $authUser): bool { return false; }
     public function update(AuthUser $authUser, Audit $audit): bool { return false; }
     public function delete(AuthUser $authUser, Audit $audit): bool { return false; }

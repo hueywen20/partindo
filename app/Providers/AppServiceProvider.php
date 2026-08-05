@@ -57,6 +57,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(\Spatie\Permission\Models\Role::class, \App\Policies\RolePolicy::class);
         Gate::policy(\OwenIt\Auditing\Models\Audit::class, \App\Policies\AuditPolicy::class);
         Gate::policy(\App\Models\Category::class, \App\Policies\CategoryPolicy::class);
+        Gate::policy(\App\Models\SalesReturn::class, \App\Policies\SalesReturnPolicy::class);
+        Gate::policy(\App\Models\PurchaseReturn::class, \App\Policies\PurchaseReturnPolicy::class);
 
         TextColumn::macro('currency', function () {
             /** @var TextColumn $this */
