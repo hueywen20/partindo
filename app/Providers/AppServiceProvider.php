@@ -8,6 +8,7 @@ use App\Observers\PurchaseItemObserver;
 use App\Models\SaleItem;
 use App\Observers\SaleItemObserver;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Support\Facades\Event; 
@@ -29,6 +30,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if ($this->app->environment('production')) {
+            URL::forceScheme('https');
+        }
         Event::listen(\Illuminate\Auth\Events\Login::class, \App\Listeners\UpdateUserSessionToken::class);
 
         // register model observers to handle stock adjustments
