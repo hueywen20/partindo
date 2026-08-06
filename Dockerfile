@@ -29,9 +29,7 @@ RUN php artisan storage:link || true
 
 EXPOSE 10000
 
-CMD php artisan migrate --force && \
-    php artisan config:cache && \
+CMD php artisan config:cache && \
     php artisan route:cache && \
     php artisan view:cache && \
-    php artisan db:seed --force && \
     php artisan serve --host=0.0.0.0 --port=10000
