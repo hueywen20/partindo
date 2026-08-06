@@ -12,14 +12,14 @@ class SuperAdminSeeder extends Seeder
     {
         // Create super_admin role (guard must match your app — 'web' is Laravel default)
         $role = Role::firstOrCreate([
-            'name'       => 'super_admin',
+            'name'       => 'Admin',
             'guard_name' => 'web',
         ]);
 
         // Assign to the first admin user (admin@example.com from DefaultSeeder)
         $user = User::where('email', 'admin@example.com')->first();
 
-        if ($user && ! $user->hasRole('super_admin')) {
+        if ($user && ! $user->hasRole('Admin')) {
             $user->assignRole($role);
         }
 
