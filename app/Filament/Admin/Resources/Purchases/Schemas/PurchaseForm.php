@@ -25,11 +25,7 @@ class PurchaseForm
      * Convert Indonesian formatted number into float.
      *
      * Examples:
-     *
-     * 30.000,00      -> 30000
-     * 1.250.000,50   -> 1250000.50
-     * 30000          -> 30000
-     * 30000.50       -> 30000.50
+     * 30.000,00      -> 30000 // 1.250.000,50   -> 1250000.50 // 30000          -> 30000 // 30000.50       -> 30000.50
      */
     public static function parseNumber(mixed $value): float
     {
@@ -45,9 +41,7 @@ class PurchaseForm
 
         /*
          * Indonesian format:
-         *
-         * 30.000,00
-         * 1.250.000,50
+         * 30.000,00 // 1.250.000,50
          */
         if (str_contains($value, ',')) {
             $value = str_replace('.', '', $value);
@@ -58,16 +52,13 @@ class PurchaseForm
 
         /*
          * Plain numeric:
-         *
-         * 30000
-         * 30000.50
+         * 30000 // 30000.50
          */
         return (float) $value;
     }
 
     /**
      * Format number as Indonesian currency.
-     *
      * 30000 -> 30.000,00
      */
     public static function formatCurrency(mixed $value): string
@@ -86,9 +77,7 @@ class PurchaseForm
 
     /**
      * Find a product using product_id.
-     *
-     * This should always be our first choice when
-     * restoring an existing purchase item.
+     * This should always be our first choice when restoring an existing purchase item.
      */
     public static function findProductById(
         mixed $productId
@@ -107,9 +96,7 @@ class PurchaseForm
 
     /**
      * Find a product containing a specific part number.
-     *
-     * Used only as a fallback for older records where
-     * product_id may be missing.
+     * Used only as a fallback for older records where product_id may be missing.
      */
     public static function findProductByPartNo(
         string $partNo
@@ -160,10 +147,7 @@ class PurchaseForm
     /**
      * Fill all product-related fields.
      *
-     * product_id
-     * product_name
-     * brand
-     * category
+     * product_id, product_name, brand, category
      */
     public static function fillProductFields(
         Product $product,
@@ -175,9 +159,7 @@ class PurchaseForm
         );
 
         /*
-         * IMPORTANT:
-         *
-         * Save description.
+         * IMPORTANT: Save description.
          */
         $set(
             'product_name',
@@ -259,7 +241,6 @@ class PurchaseForm
 
     /**
      * Recalculate final total.
-     *
      * final = subtotal + tax - discount
      */
     public static function recalculateFinal(
@@ -394,9 +375,7 @@ class PurchaseForm
         /*
          * Normalize:
          *
-         * OR 2.4 -> or2.4
-         * OR2.4  -> or2.4
-         * OR-2.4 -> or2.4
+         * OR 2.4 -> or2.4 // OR2.4  -> or2.4 // OR-2.4 -> or2.4
          */
         $normalizedSearch = strtolower(
             str_replace(
@@ -683,8 +662,7 @@ class PurchaseForm
                                 }
 
                                 /*
-                                 * Composite value from
-                                 * search dropdown.
+                                 * Composite value from search dropdown.
                                  */
                                 [
                                     ,
@@ -761,8 +739,7 @@ class PurchaseForm
                                 );
 
                                 /*
-                                 * Store ONLY the actual part
-                                 * number in the database.
+                                 * Store ONLY the actual part number in the database.
                                  */
                                 $set(
                                     'part_no',
@@ -774,12 +751,9 @@ class PurchaseForm
                         /*
                          * IMPORTANT FIX:
                          *
-                         * When editing an existing purchase,
-                         * use product_id FIRST.
+                         * When editing an existing purchase, use product_id FIRST.
                          *
-                         * Do NOT try to find the product
-                         * from part_no unless product_id
-                         * is missing.
+                         * Do NOT try to find the product from part_no unless product_id is missing.
                          */
                         ->afterStateHydrated(
                             function (
@@ -884,8 +858,7 @@ class PurchaseForm
                          *
                          * ->dehydrated(false)
                          *
-                         * which meant the description was
-                         * NEVER saved.
+                         * which meant the description was NEVER saved.
                          */
                         ->dehydrated(true),
 
