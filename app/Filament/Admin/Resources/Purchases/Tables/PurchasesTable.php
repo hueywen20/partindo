@@ -17,12 +17,13 @@ class PurchasesTable
             ->columns([
                 TextColumn::make('No.')
                     ->rowIndex(),
-                TextColumn::make('date')
-                    ->date('d-m-Y')
-                    ->sortable(),
                 TextColumn::make('purchase_inv_no')
                     ->label('Purchase Invoice No.')
                     ->searchable()
+                    ->sortable(),
+                TextColumn::make('date')
+                    ->label('Invoice Date')
+                    ->date('d-m-Y')
                     ->sortable(),
                 TextColumn::make('supplier.company_name')
                     ->label('Supplier')

@@ -289,9 +289,14 @@ class PurchaseForm
     // ============================================================
 
     /**
-     * Rich HTML result shown inside search dropdown.
+     * Search result label: bold monospace part number, muted gray for
+     * description/brand. No fixed width anywhere — the earlier "clipped"
+     * dropdown was actually a fixed 720px inner width overflowing the
+     * browser window, not a container limit. Flexbox with no forced
+     * width sizes naturally to content, same as plain text did, but
+     * lets us style it for readability.
      */
-    public static function formatPartOptionLabel(
+    private static function partNoSearchLabel(
         Product $product,
         string $codeLine
     ): string {
@@ -303,59 +308,14 @@ class PurchaseForm
 
         $brand = e(
             $product->brandModel?->name
-                ?? $product->brand
-                ?? '-'
-        );
-
-        $category = e(
-            $product->categoryModel?->name
-                ?? $product->category
                 ?? '-'
         );
 
         return '
-            <div style="
-                display: grid;
-                grid-template-columns: 220px 220px 140px 140px;
-                gap: 16px;
-                align-items: start;
-                width: 720px;
-                min-width: 720px;
-                font-size: 13px;
-                line-height: 1.5;
-            ">
-
-                <span style="
-                    font-family: monospace;
-                    white-space: normal;
-                    word-break: break-word;
-                ">
-                    ' . $code . '
-                </span>
-
-                <span style="
-                    white-space: normal;
-                    word-break: break-word;
-                ">
-                    ' . $name . '
-                </span>
-
-                <span style="
-                    color: #6b7280;
-                    white-space: normal;
-                    word-break: break-word;
-                ">
-                    ' . $brand . '
-                </span>
-
-                <span style="
-                    color: #6b7280;
-                    white-space: normal;
-                    word-break: break-word;
-                ">
-                    ' . $category . '
-                </span>
-
+            <div style="display:flex; gap:12px; align-items:baseline; white-space:nowrap; font-size:13px;">
+                <span style="font-family:monospace; font-weight:600; color:#111827;">' . $code . '</span>
+                <span style="color:#374151;">' . $name . '</span>
+                <span style="color:#9ca3af;">' . $brand . '</span>
             </div>
         ';
     }
@@ -491,7 +451,7 @@ class PurchaseForm
                             ) {
                                 return [
                                     "{$product->id}::{$line}"
-                                        => self::formatPartOptionLabel(
+                                        => self::partNoSearchLabel(
                                             $product,
                                             $line
                                         ),
@@ -631,6 +591,9 @@ class PurchaseForm
                     Select::make('part_no')
                         ->label('Part No')
                         ->allowHtml()
+                        ->extraAttributes([
+                            'style' => 'font-family:monospace; font-weight:600; color:#000;',
+                        ])
 
                         ->getSearchResultsUsing(
                             fn (
@@ -852,6 +815,14 @@ class PurchaseForm
                         ->readOnly()
 
                         /*
+                         * Match the search dropdown's typography for
+                         * visual consistency across the row.
+                         */
+                        ->extraInputAttributes([
+                            'style' => 'color:#000; font-size:13px;',
+                        ])
+
+                        /*
                          * IMPORTANT:
                          *
                          * Previously this was:
@@ -869,6 +840,9 @@ class PurchaseForm
                     TextInput::make('brand')
                         ->label('Brand')
                         ->readOnly()
+                        ->extraInputAttributes([
+                            'style' => 'color:#000; font-size:13px;',
+                        ])
                         ->dehydrated(true),
 
                     // ============================================

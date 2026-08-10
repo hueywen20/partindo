@@ -11,6 +11,7 @@ class PurchaseItem extends Model
         'product_id',
         'category',
         'part_no',
+        'product_name',
         'brand',
         'qty',
         'price',
