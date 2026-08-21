@@ -37,21 +37,30 @@ class ProductsTable
                     })
                     ->listWithLineBreaks()
                     ->searchable(query: function ($query, string $search) {
-                        $normalized = str_replace([' ', '-'], '', $search);
+                        $searchLower = strtolower($search);
+                        $normalized = str_replace([' ', '-'], '', $searchLower);
 
-                        $query->where(function ($q) use ($search, $normalized) {
-                            $q->where('code', 'like', "%{$search}%")
-                                ->orWhereRaw("REPLACE(REPLACE(code, ' ', ''), '-', '') LIKE ?", ["%{$normalized}%"]);
+                        $query->where(function ($q) use ($searchLower, $normalized) {
+                            $q->whereRaw("LOWER(code) LIKE ?", ["%{$searchLower}%"])
+                                ->orWhereRaw("REPLACE(REPLACE(LOWER(code), ' ', ''), '-', '') LIKE ?", ["%{$normalized}%"]);
                         });
                     })
                     ->sortable()
                     ->limitList(3)
                     ->badge()
+                    ->copyable() // Add this: Users can now click the badge to copy the code
+                    ->copyMessage('Part number copied!') //
                     ->expandableLimitedList(),
 
                 TextColumn::make('name')
-                    ->searchable(query: function ($query, $search) {
-                        $query->where('name', 'like', "%{$search}%");
+                    ->searchable(query: function ($query, string $search) {
+                        $searchLower = strtolower($search);
+                        $normalized = str_replace([' ', '-'], '', $searchLower);
+
+                        $query->where(function ($q) use ($searchLower, $normalized) {
+                            $q->whereRaw("LOWER(name) LIKE ?", ["%{$searchLower}%"])
+                                ->orWhereRaw("REPLACE(REPLACE(LOWER(name), ' ', ''), '-', '') LIKE ?", ["%{$normalized}%"]);
+                        });
                     })
                     ->sortable(),
 
@@ -59,14 +68,24 @@ class ProductsTable
                     ->label('Brand')
                     ->badge()
                     ->color('secondary')
-                    ->searchable()
+                    ->searchable(query: function (Builder $query, string $search) {
+                        $searchLower = strtolower($search);
+                        $query->whereHas('brandModel', function ($q) use ($searchLower) {
+                            $q->whereRaw("LOWER(name) LIKE ?", ["%{$searchLower}%"]);
+                        });
+                    })
                     ->sortable(),
 
                 TextColumn::make('categoryModel.name')
                     ->label('Category')
                     ->badge()
                     ->color('info')
-                    ->searchable()
+                    ->searchable(query: function (Builder $query, string $search) {
+                        $searchLower = strtolower($search);
+                        $query->whereHas('categoryModel', function ($q) use ($searchLower) {
+                            $q->whereRaw("LOWER(name) LIKE ?", ["%{$searchLower}%"]);
+                        });
+                    })
                     ->sortable(),
 
                 TextColumn::make('stock')
@@ -106,12 +125,22 @@ class ProductsTable
 
                 TextColumn::make('uomModel.name')
                     ->label('UOM')
-                    ->searchable()
+                    ->searchable(query: function (Builder $query, string $search) {
+                        $searchLower = strtolower($search);
+                        $query->whereHas('uomModel', function ($q) use ($searchLower) {
+                            $q->whereRaw("LOWER(name) LIKE ?", ["%{$searchLower}%"]);
+                        });
+                    })
                     ->sortable(),
 
                 TextColumn::make('locationModel.name')
                     ->label('Location')
-                    ->searchable()
+                    ->searchable(query: function (Builder $query, string $search) {
+                        $searchLower = strtolower($search);
+                        $query->whereHas('locationModel', function ($q) use ($searchLower) {
+                            $q->whereRaw("LOWER(name) LIKE ?", ["%{$searchLower}%"]);
+                        });
+                    })
                     ->sortable(),
 
                 TextColumn::make('unit')
@@ -127,7 +156,10 @@ class ProductsTable
                     })
                     ->listWithLineBreaks()
                     ->badge()
-                    ->searchable()
+                    ->searchable(query: function ($query, string $search) {
+                        $searchLower = strtolower($search);
+                        $query->whereRaw("LOWER(unit) LIKE ?", ["%{$searchLower}%"]);
+                    })
                     ->sortable()
                     ->limitList(3)
                     ->expandableLimitedList(),
@@ -159,7 +191,8 @@ class ProductsTable
                     ])
                     ->query(function (Builder $query, array $data) {
                         if (filled($data['name'])) {
-                            $query->where('name', 'like', "%{$data['name']}%");
+                            $searchLower = strtolower($data['name']);
+                            $query->whereRaw("LOWER(name) LIKE ?", ["%{$searchLower}%"]);
                         }
                     })
                     ->indicateUsing(function (array $data) {
@@ -174,7 +207,8 @@ class ProductsTable
                     ])
                     ->query(function (Builder $query, array $data) {
                         if (filled($data['location'])) {
-                            $query->where('location', 'like', "%{$data['location']}%");
+                            $searchLower = strtolower($data['location']);
+                            $query->whereRaw("LOWER(location) LIKE ?", ["%{$searchLower}%"]);
                         }
                     })
                     ->indicateUsing(function (array $data) {
@@ -206,6 +240,9 @@ class ProductsTable
             ])
             ->filtersFormColumns(3)
             ->defaultSort('code', 'asc')
+            ->persistSearchInSession()
+            ->persistFiltersInSession()
+            ->persistSortInSession()
             ->recordUrl(fn ($record) => ProductResource::getUrl('view', ['record' => $record]))
             ->recordActions([
                 ReplicateAction::make()

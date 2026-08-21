@@ -14,6 +14,9 @@ use Filament\Forms\Components\TextInput;
 use Illuminate\Support\Facades\Event; 
 use Illuminate\Auth\Events\Login;
 use App\Listeners\UpdateUserSessionToken;
+use Filament\Support\Facades\FilamentView; // <--- ADD THIS
+use Filament\View\PanelsRenderHook;          // <--- ADD THIS
+use Illuminate\Support\Facades\Blade;        // <--- ADD THIS
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -35,10 +38,25 @@ class AppServiceProvider extends ServiceProvider
         }
         Event::listen(\Illuminate\Auth\Events\Login::class, \App\Listeners\UpdateUserSessionToken::class);
 
+        // Inject table column borders CSS automatically
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::HEAD_END,
+            fn (): string => Blade::render('<style>
+                .fi-ta-table th:not(:last-child),
+                .fi-ta-table td:not(:last-child) {
+                    border-right-width: 1px !important;
+                    border-right-color: #e5e7eb !important;
+                }
+                .dark .fi-ta-table th:not(:last-child),
+                .dark .fi-ta-table td:not(:last-child) {
+                    border-right-color: #374151 !important;
+                }
+            </style>')
+        );
+
         // register model observers to handle stock adjustments
         PurchaseItem::observe(PurchaseItemObserver::class);
         SaleItem::observe(SaleItemObserver::class);
-
 
         // admin bypasses ALL permission checks
         // This is required for FilamentShieldPlugin to work correctly
@@ -69,42 +87,6 @@ class AppServiceProvider extends ServiceProvider
             return $this->formatStateUsing(fn ($state) => number_format($state, 2, ',', '.'));
         });
 
-        // TextInput::macro('currency', function () {
-        //     /** @var \Filament\Forms\Components\TextInput $this */
-        //     $parse = function ($state): float {
-        //         if (! filled($state)) {
-        //             return 0.0;
-        //         }
-
-        //         $state = (string) $state;
-
-        //         // Convert: 1.000.000,00 → 1000000.00
-        //         $state = str_replace('.', '', $state);
-        //         $state = str_replace(',', '.', $state);
-
-        //         return (float) $state;
-        //     };
-
-        //     return $this
-        //         ->prefix('Rp')
-        //         ->numeric()
-
-        //         // ✅ Filament v5 correct masking system
-        //         ->mask(\Filament\Support\RawJs::make('$money($input, \',\', \'.\', 2)'))
-
-        //         // ✅ display formatting
-        //         ->formatStateUsing(function ($state) use ($parse) {
-        //             if (! filled($state)) {
-        //                 return '';
-        //             }
-
-        //             return number_format($parse($state), 2, ',', '.');
-        //         })
-
-        //         // ✅ store clean float
-        //         ->dehydrateStateUsing(fn ($state) => $parse($state));
-        // });
-
         TextInput::macro('currency', function () {
             /** @var TextInput $this */
             $parseCurrency = function ($state): float {
@@ -130,6 +112,5 @@ class AppServiceProvider extends ServiceProvider
                 ->formatStateUsing(fn ($state) => filled($state) ? number_format($parseCurrency($state), 2, ',', '.') : '')
                 ->dehydrateStateUsing(fn ($state) => $parseCurrency($state));
         });
-        
     }
 }
